@@ -21,7 +21,12 @@ FROM base AS builder
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 ARG NEXT_PUBLIC_SITE_URL=https://bigbillionday.store
+# Admin panel on its own subdomain; storefront links from admin become absolute. Leave empty for single-host.
+ARG NEXT_PUBLIC_ADMIN_HOST=
+ARG NEXT_PUBLIC_STORE_ORIGIN=
 ENV NEXT_PUBLIC_SITE_URL=${NEXT_PUBLIC_SITE_URL}
+ENV NEXT_PUBLIC_ADMIN_HOST=${NEXT_PUBLIC_ADMIN_HOST}
+ENV NEXT_PUBLIC_STORE_ORIGIN=${NEXT_PUBLIC_STORE_ORIGIN}
 # Build-time DB access is not required: pages fall back gracefully and revalidate at runtime.
 ENV DATABASE_URL=postgresql://build:build@localhost:5432/build
 RUN npx prisma generate && npm run build

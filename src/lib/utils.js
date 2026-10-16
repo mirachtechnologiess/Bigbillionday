@@ -63,3 +63,10 @@ export const WATCH_ATTRS = {
   waterResistance: ["30m", "50m", "100m", "200m", "300m+"],
   dialColor: ["Black", "Blue", "White", "Silver", "Green", "Grey", "Gold", "Rose Gold", "Brown", "Red", "Champagne", "Skeleton", "Mother of Pearl"],
 };
+
+/**
+ * Link from the admin panel to a storefront page. In production the admin runs on its own
+ * subdomain, so storefront links must be absolute (NEXT_PUBLIC_STORE_ORIGIN, baked in at build).
+ * Locally it is unset and the relative path is used.
+ */
+export const storeUrl = (path = "/") => `${process.env.NEXT_PUBLIC_STORE_ORIGIN || ""}${path}`;

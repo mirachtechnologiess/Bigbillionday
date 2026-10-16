@@ -262,7 +262,7 @@ export function TagInput({ value = [], onChange, placeholder = "Type and press E
 /** Debounced search box bound to a URL search param. */
 export function SearchInput({ param = "q", placeholder = "Search…", className }) {
   const router = useRouter();
-  const pathname = usePathname();
+  const pathname = useAdminPathname();
   const sp = useSearchParams();
   const [v, setV] = useState(sp.get(param) || "");
   const [pending, start] = useTransition();
@@ -294,7 +294,7 @@ export function SearchInput({ param = "q", placeholder = "Search…", className 
 /** Hook: update URL search params from client components. */
 export function useQueryState() {
   const router = useRouter();
-  const pathname = usePathname();
+  const pathname = useAdminPathname();
   const sp = useSearchParams();
   const [pending, start] = useTransition();
   const set = (patch, { resetPage = true } = {}) => {
@@ -514,4 +514,14 @@ export function timeAgo(d) {
   if (s < 86400) return `${Math.floor(s / 3600)}h ago`;
   if (s < 86400 * 30) return `${Math.floor(s / 86400)}d ago`;
   return fmtDate(d);
+}
+
+/**
+ * usePathname() normalised to the app's /admin/* routes. On admin.bigbillionday.store the browser
+ * shows clean paths (/orders) that the middleware rewrites to /admin/orders; nav highlighting and
+ * URL-building code compare against /admin/*.
+ */
+export function useAdminPathname() {
+  const p = usePathname() || "/";
+  return p === "/admin" || p.startsWith("/admin/") ? p : "/admin" + (p === "/" ? "" : p);
 }

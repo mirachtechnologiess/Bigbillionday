@@ -8,7 +8,7 @@ import {
   Archive, Copy, Eye, FileEdit, ImageOff, Percent, Rocket, Sparkles, Star, StarOff, Trash2, Watch, X,
 } from "lucide-react";
 import { toast } from "sonner";
-import { cn, formatINR } from "@/lib/utils";
+import { cn, formatINR, storeUrl } from "@/lib/utils";
 import { api } from "../fetcher";
 import {
   ConfirmButton, Empty, Modal, Pagination, Pill, ProductStatusPill, SearchInput, Spinner, StockPill, Tabs, timeAgo, useQueryState,
@@ -285,7 +285,7 @@ export default function ProductsTable({ data, brands, counts, isAdmin, aiOn }) {
                           <FileEdit />
                         </Link>
                         {p.status === "ACTIVE" && (
-                          <a href={`/watches/${p.slug}`} target="_blank" rel="noreferrer" className="a-btn a-btn-ghost a-btn-sm a-btn-icon" title="View in store" aria-label="View in store">
+                          <a href={storeUrl(`/watches/${p.slug}`)} target="_blank" rel="noreferrer" className="a-btn a-btn-ghost a-btn-sm a-btn-icon" title="View in store" aria-label="View in store">
                             <Eye />
                           </a>
                         )}

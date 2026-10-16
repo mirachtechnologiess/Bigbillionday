@@ -145,7 +145,7 @@ cat <<EOF
 
 Server is ready. Next steps:
  1. Paste your NVIDIA key:   nano $APP_DIR/.env
- 2. Point DNS (Namecheap → Advanced DNS): A @ → $(curl -fsS4 https://ifconfig.me 2>/dev/null || echo SERVER_IP), A www → same IP
+ 2. Point DNS (Namecheap → Advanced DNS): A records @, www and admin → $(curl -fsS4 https://ifconfig.me 2>/dev/null || echo SERVER_IP)
  3. In GitHub → repo → Settings → Secrets and variables → Actions, add:
       VPS_HOST     = $(curl -fsS4 https://ifconfig.me 2>/dev/null || echo SERVER_IP)
       VPS_USER     = $DEPLOY_USER

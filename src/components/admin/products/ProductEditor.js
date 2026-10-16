@@ -8,7 +8,7 @@ import {
   ArrowLeft, Copy, Eye, Languages, Loader2, Plus, Save, ScanSearch, Sparkles, Tag, Wand2, Wand, IndianRupee, Boxes, Layers, Search, Image as ImageIcon, Type, Cog, Rocket,
 } from "lucide-react";
 import { toast } from "sonner";
-import { cn, formatINR, slugify, discountPct, WATCH_ATTRS, GENDER_LABEL } from "@/lib/utils";
+import { cn, formatINR, slugify, discountPct, WATCH_ATTRS, GENDER_LABEL, storeUrl } from "@/lib/utils";
 import { api } from "../fetcher";
 import { Card, ConfirmButton, Field, Pill, TagInput, Toggle, Spinner } from "../ui";
 import ImageUploader from "./ImageUploader";
@@ -425,7 +425,7 @@ export default function ProductEditor({ product, meta, storeName, aiOn, isAdmin 
             </div>
           )}
           {!isNew && form.status === "ACTIVE" && (
-            <a href={`/watches/${form.slug}`} target="_blank" rel="noreferrer" className="a-btn a-btn-ghost a-btn-sm hidden sm:inline-flex">
+            <a href={storeUrl(`/watches/${form.slug}`)} target="_blank" rel="noreferrer" className="a-btn a-btn-ghost a-btn-sm hidden sm:inline-flex">
               <Eye /> View
             </a>
           )}

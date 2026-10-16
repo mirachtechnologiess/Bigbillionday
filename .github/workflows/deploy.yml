@@ -65,7 +65,10 @@ jobs:
           context: .
           target: runner
           push: true
-          build-args: NEXT_PUBLIC_SITE_URL=https://bigbillionday.store
+          build-args: |
+            NEXT_PUBLIC_SITE_URL=https://bigbillionday.store
+            NEXT_PUBLIC_ADMIN_HOST=admin.bigbillionday.store
+            NEXT_PUBLIC_STORE_ORIGIN=https://bigbillionday.store
           tags: ${{ steps.names.outputs.web }}:${{ github.sha }},${{ steps.names.outputs.web }}:latest
           cache-from: type=gha,scope=web
           cache-to: type=gha,mode=max,scope=web

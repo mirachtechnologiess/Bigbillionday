@@ -45,6 +45,7 @@ nano /opt/bigbillionday/.env        # paste NVIDIA_API_KEY=nvapi-..., save with 
 |---|---|---|
 | A Record | `@` | YOUR_SERVER_IP |
 | A Record | `www` | YOUR_SERVER_IP |
+| A Record | `admin` | YOUR_SERVER_IP |
 
 Delete any old parking-page or URL-redirect records. DNS usually updates within 5–30 minutes.
 
@@ -65,7 +66,7 @@ ssh deploy@YOUR_SERVER_IP
 cd /opt/bigbillionday
 docker compose run --rm migrate node scripts/import-legacy.mjs
 ```
-This imports all products and photos from the old premiumshopy.com in about 1–2 minutes. Then open **https://bigbillionday.store** and log in at **/admin** with the admin password from step 2.
+This imports all products and photos from the old premiumshopy.com in about 1–2 minutes. Then open **https://bigbillionday.store** for the store. The admin panel is at **https://admin.bigbillionday.store**; log in with the admin password from step 2. Visiting bigbillionday.store/admin also redirects there.
 
 ## Everyday commands (as `deploy`, in `/opt/bigbillionday`)
 | Task | Command |

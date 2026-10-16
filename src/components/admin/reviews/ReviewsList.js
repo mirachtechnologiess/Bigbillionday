@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { BadgeCheck, Check, ExternalLink, MessageSquareText, Sparkles, Star, Trash2, X } from "lucide-react";
 import { toast } from "sonner";
-import { cn } from "@/lib/utils";
+import { cn, storeUrl } from "@/lib/utils";
 import { api } from "../fetcher";
 import { ConfirmButton, Empty, PageHeader, Pagination, Pill, SearchInput, Spinner, Tabs, fmtDate, timeAgo, useQueryState } from "../ui";
 
@@ -190,7 +190,7 @@ export default function ReviewsList({ status, rows, counts, page, pages, total, 
                       </span>
                       <span className="line-clamp-1 max-w-[320px] text-[12.5px] text-bone-2">{r.product.name}</span>
                     </Link>
-                    <a href={`/watches/${r.product.slug}#reviews`} target="_blank" rel="noreferrer" className="text-mute hover:text-bone" aria-label="Open on storefront">
+                    <a href={storeUrl(`/watches/${r.product.slug}#reviews`)} target="_blank" rel="noreferrer" className="text-mute hover:text-bone" aria-label="Open on storefront">
                       <ExternalLink className="h-3.5 w-3.5" />
                     </a>
                   </div>

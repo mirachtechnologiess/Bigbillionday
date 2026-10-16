@@ -8,7 +8,7 @@ import { toast } from "sonner";
 import { ArrowDown, ArrowUp, Check, ExternalLink, GripVertical, Plus, Search, Trash2, Watch, X } from "lucide-react";
 import { api } from "@/components/admin/fetcher";
 import { Card, ConfirmButton, Field, ImagePicker, PageHeader, Pill, ProductStatusPill, Spinner, Toggle } from "@/components/admin/ui";
-import { cn, formatINR, slugify } from "@/lib/utils";
+import { cn, formatINR, slugify, storeUrl } from "@/lib/utils";
 import { moveItem } from "@/components/admin/brands/shared";
 
 const toForm = (c) => ({
@@ -99,7 +99,7 @@ export default function CollectionEditor({ collection, canDelete }) {
           <>
             {dirty && <Pill tone="gold">Unsaved changes</Pill>}
             {collection && f.isActive && (
-              <Link href={`/collections/${collection.slug}`} target="_blank" className="a-btn a-btn-ghost">
+              <Link href={storeUrl(`/collections/${collection.slug}`)} target="_blank" className="a-btn a-btn-ghost">
                 <ExternalLink /> View
               </Link>
             )}

@@ -8,7 +8,7 @@ import {
   Package, PackageOpen, RotateCcw, ShieldAlert, Truck, Undo2, User,
 } from "lucide-react";
 import { toast } from "sonner";
-import { cn, formatINR, ORDER_FLOW, ORDER_STATUS_LABEL } from "@/lib/utils";
+import { cn, formatINR, ORDER_FLOW, ORDER_STATUS_LABEL, storeUrl } from "@/lib/utils";
 import { api } from "../fetcher";
 import { Card, CopyButton, Field, Modal, OrderStatusPill, PageHeader, PAYMENT_TONE, Pill, RiskPill, Spinner, fmtDate, timeAgo } from "../ui";
 
@@ -251,7 +251,7 @@ export default function OrderDetail({ order: o, allowed, storeName }) {
                       <span className="a-num">SKU {it.sku}</span>
                       {it.product && <span>In stock: <span className="a-num">{it.product.stock}</span></span>}
                       {it.product && (
-                        <a href={`/watches/${it.product.slug}`} target="_blank" rel="noreferrer" className="inline-flex items-center gap-0.5 hover:text-bone">
+                        <a href={storeUrl(`/watches/${it.product.slug}`)} target="_blank" rel="noreferrer" className="inline-flex items-center gap-0.5 hover:text-bone">
                           Storefront <ExternalLink className="h-3 w-3" />
                         </a>
                       )}

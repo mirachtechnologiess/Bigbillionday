@@ -6,9 +6,10 @@ import { usePathname, useRouter } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
 import { ExternalLink, LogOut, Menu, PanelLeftClose, PanelLeftOpen, Search, X } from "lucide-react";
 import { toast } from "sonner";
-import { cn } from "@/lib/utils";
+import { cn, storeUrl } from "@/lib/utils";
 import { NAV } from "./nav";
 import CommandPalette from "./CommandPalette";
+import { useAdminPathname } from "./ui";
 
 function Crown({ className }) {
   // a tiny watch-crown mark
@@ -23,7 +24,7 @@ function Crown({ className }) {
 }
 
 function NavList({ collapsed, badges, onNavigate }) {
-  const pathname = usePathname();
+  const pathname = useAdminPathname();
   const isActive = (it) => (it.exact ? pathname === it.href : pathname === it.href || pathname.startsWith(it.href + "/"));
   return (
     <nav className="flex-1 overflow-y-auto px-2 pb-4">
@@ -73,7 +74,7 @@ function NavList({ collapsed, badges, onNavigate }) {
 
 export default function AdminShell({ user, badges, storeName, aiOn, children }) {
   const router = useRouter();
-  const pathname = usePathname();
+  const pathname = useAdminPathname();
   const [collapsed, setCollapsed] = useState(false);
   const [mobile, setMobile] = useState(false);
   const [palette, setPalette] = useState(false);
@@ -228,7 +229,7 @@ export default function AdminShell({ user, badges, storeName, aiOn, children }) 
             <span className={cn("pill hidden md:inline-flex", "!h-7")} data-tone={aiOn ? "lume" : "mute"} title={aiOn ? "NVIDIA NIM connected" : "NVIDIA_API_KEY not set"}>
               AI {aiOn ? "online" : "offline"}
             </span>
-            <a href="/" target="_blank" rel="noreferrer" className="a-btn a-btn-ghost a-btn-sm">
+            <a href={storeUrl("/")} target="_blank" rel="noreferrer" className="a-btn a-btn-ghost a-btn-sm">
               <ExternalLink /> <span className="hidden sm:inline">Storefront</span>
             </a>
           </div>
