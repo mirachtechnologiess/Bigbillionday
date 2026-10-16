@@ -132,6 +132,13 @@ async function main() {
   });
   console.log(`✓ admin: ${email}`);
 
+  const demo = process.env.SEED_DEMO !== "false";
+  if (demo) await seedDemoCatalog();
+  await db.coupon.upsert({ where: { code: "WELCOME10" }, update: {}, create: { code: "WELCOME10", description: "10% off your first order (max ₹2,000)", type: "PERCENT", value: 10, minOrder: 999, maxDiscount: 2000 } });
+  console.log(demo ? "✓ demo catalog + WELCOME10 coupon" : "✓ WELCOME10 coupon (demo catalog skipped — import the real catalog with scripts/import-legacy.mjs)");
+}
+
+async function seedDemoCatalog() {
   const brandIds = {};
   for (const [i, [name, country, isFeatured]] of BRANDS.entries()) {
     const b = await db.brand.upsert({
@@ -186,8 +193,7 @@ async function main() {
       await db.collectionProduct.upsert({ where: { collectionId_productId: { collectionId: c.id, productId: p.id } }, update: {}, create: { collectionId: c.id, productId: p.id, position: pos } });
     }
   }
-  await db.coupon.upsert({ where: { code: "WELCOME10" }, update: {}, create: { code: "WELCOME10", description: "10% off your first watch (max ₹2,000)", type: "PERCENT", value: 10, minOrder: 2999, maxDiscount: 2000 } });
-  console.log("✓ collections + WELCOME10 coupon");
+  console.log("✓ demo collections");
 }
 
 main()

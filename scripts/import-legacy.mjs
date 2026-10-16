@@ -157,15 +157,15 @@ async function main() {
         tags: [brand.toLowerCase(), category.toLowerCase(), (v.color || "").toLowerCase()].filter(Boolean),
         isNewArrival: Date.now() - new Date(p.date || 0).getTime() < 1000 * 60 * 60 * 24 * 45,
         isFeatured: p.timer === true,
-        status: "ACTIVE",
       };
       if (existing) {
-        await db.product.update({ where: { id: existing.id }, data });
+        await db.product.update({ where: { id: existing.id }, data: { ...data, status: existing.images.length ? existing.status : "DRAFT" } });
       } else {
         let s = slug(`${brand} ${name}`) || slug(sku);
         if (await db.product.findUnique({ where: { slug: s } })) s = `${s}-${p._id.slice(-5)}`;
         await db.product.create({
-          data: { ...data, sku, slug: s, stock: 10, createdAt: p.date ? new Date(p.date) : undefined, images: { create: images } },
+          // No downloadable photo → keep it hidden until an image is added in admin
+          data: { ...data, sku, slug: s, stock: 10, status: images.length ? "ACTIVE" : "DRAFT", createdAt: p.date ? new Date(p.date) : undefined, images: { create: images } },
         });
       }
       ok++;

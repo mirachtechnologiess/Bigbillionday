@@ -1,0 +1,30 @@
+# Caddy: automatic HTTPS (Let's Encrypt) + compression + reverse proxy to the Next.js container.
+# DNS: A records for bigbillionday.store and www.bigbillionday.store → this VPS's IP.
+{
+	email admin@bigbillionday.store
+}
+
+www.bigbillionday.store {
+	redir https://bigbillionday.store{uri} permanent
+}
+
+bigbillionday.store {
+	encode zstd gzip
+
+	# Product photo uploads from the admin panel (10 MB each, several per request)
+	request_body {
+		max_size 40MB
+	}
+
+	header {
+		Strict-Transport-Security "max-age=31536000; includeSubDomains"
+		-Server
+	}
+
+	reverse_proxy web:3000 {
+		# AI product-from-photo can take ~30-60 s
+		transport http {
+			read_timeout 120s
+		}
+	}
+}

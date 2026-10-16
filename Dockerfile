@@ -27,10 +27,13 @@ ENV DATABASE_URL=postgresql://build:build@localhost:5432/build
 RUN npx prisma generate && npm run build
 
 # ---------- migrator ----------
+# Slim one-shot image: only what migrations, seeding and the catalog importer need (~1/5 the size
+# of copying the full node_modules), so it pulls quickly on a small VPS.
 FROM base AS migrator
-COPY --from=deps /app/node_modules ./node_modules
-COPY package.json ./
+RUN npm init -y >/dev/null  && npm install --omit=dev --no-audit --no-fund prisma@6.16.2 @prisma/client@6.16.2 bcryptjs@3.0.2 sharp@0.34.4  && npm cache clean --force
 COPY prisma ./prisma
+COPY scripts ./scripts
+RUN npx prisma generate
 ENV UPLOAD_DIR=/app/storage/uploads
 CMD ["sh", "-c", "npx prisma migrate deploy && if [ \"$RUN_SEED\" = \"true\" ]; then node prisma/seed.mjs; fi"]
 

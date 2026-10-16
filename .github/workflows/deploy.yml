@@ -1,8 +1,14 @@
 name: CI / CD
 
-# Push to main → lint + build → Docker images to GHCR → migrate DB → rolling deploy to Kubernetes.
-# Required repo secrets:
-#   KUBE_CONFIG  – base64 of a kubeconfig with access to the "premiumshopy" namespace
+# Push to main → lint + build → Docker images to GHCR → deploy to the VPS with Docker Compose.
+# The VPS never builds anything (1 GB RAM is not enough for `next build`); it only pulls images.
+#
+# Repo secrets (Settings → Secrets and variables → Actions) — printed by deploy/vps/setup.sh:
+#   VPS_HOST      server IP
+#   VPS_USER      deploy
+#   VPS_SSH_KEY   private key of the deploy user
+#   VPS_PORT      optional, default 22
+# Until VPS_HOST is set the deploy job is skipped (CI + images still run).
 on:
   push:
     branches: [main]
@@ -11,12 +17,10 @@ on:
 
 concurrency:
   group: deploy-${{ github.ref }}
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 env:
-  REGISTRY: ghcr.io
-  WEB_IMAGE: ghcr.io/${{ github.repository_owner }}/premiumshopy-web
-  MIGRATOR_IMAGE: ghcr.io/${{ github.repository_owner }}/premiumshopy-migrator
+  APP_DIR: /opt/bigbillionday
 
 jobs:
   verify:
@@ -39,12 +43,20 @@ jobs:
     if: github.event_name != 'pull_request'
     runs-on: ubuntu-latest
     permissions: { contents: read, packages: write }
+    outputs:
+      web: ${{ steps.names.outputs.web }}
+      migrator: ${{ steps.names.outputs.migrator }}
     steps:
       - uses: actions/checkout@v4
+      - id: names
+        run: |
+          owner="${GITHUB_REPOSITORY_OWNER,,}"
+          echo "web=ghcr.io/${owner}/bigbillionday-web" >> "$GITHUB_OUTPUT"
+          echo "migrator=ghcr.io/${owner}/bigbillionday-migrator" >> "$GITHUB_OUTPUT"
       - uses: docker/setup-buildx-action@v3
       - uses: docker/login-action@v3
         with:
-          registry: ${{ env.REGISTRY }}
+          registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
       - name: Web image
@@ -53,7 +65,8 @@ jobs:
           context: .
           target: runner
           push: true
-          tags: ${{ env.WEB_IMAGE }}:${{ github.sha }},${{ env.WEB_IMAGE }}:latest
+          build-args: NEXT_PUBLIC_SITE_URL=https://bigbillionday.store
+          tags: ${{ steps.names.outputs.web }}:${{ github.sha }},${{ steps.names.outputs.web }}:latest
           cache-from: type=gha,scope=web
           cache-to: type=gha,mode=max,scope=web
       - name: Migrator image
@@ -62,7 +75,7 @@ jobs:
           context: .
           target: migrator
           push: true
-          tags: ${{ env.MIGRATOR_IMAGE }}:${{ github.sha }},${{ env.MIGRATOR_IMAGE }}:latest
+          tags: ${{ steps.names.outputs.migrator }}:${{ github.sha }},${{ steps.names.outputs.migrator }}:latest
           cache-from: type=gha,scope=migrator
           cache-to: type=gha,mode=max,scope=migrator
 
@@ -70,25 +83,67 @@ jobs:
     needs: images
     runs-on: ubuntu-latest
     environment: production
+    env:
+      HAS_VPS: ${{ secrets.VPS_HOST != '' }}
     steps:
+      - name: VPS not configured yet
+        if: env.HAS_VPS != 'true'
+        run: echo "::notice::VPS_HOST secret not set — skipping deploy. Run deploy/vps/setup.sh on the server and add the secrets it prints."
+
       - uses: actions/checkout@v4
-      - uses: azure/setup-kubectl@v4
-      - name: Configure kubeconfig
+        if: env.HAS_VPS == 'true'
+
+      - name: SSH setup
+        if: env.HAS_VPS == 'true'
+        env:
+          KEY: ${{ secrets.VPS_SSH_KEY }}
+          HOST: ${{ secrets.VPS_HOST }}
+          PORT: ${{ secrets.VPS_PORT || '22' }}
         run: |
-          mkdir -p ~/.kube
-          echo "${{ secrets.KUBE_CONFIG }}" | base64 -d > ~/.kube/config
-      - name: Apply base manifests
+          mkdir -p ~/.ssh
+          printf '%s\n' "$KEY" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          ssh-keyscan -p "$PORT" -H "$HOST" >> ~/.ssh/known_hosts 2>/dev/null
+          cat >> ~/.ssh/config <<EOF
+          Host vps
+            HostName $HOST
+            Port $PORT
+            User ${{ secrets.VPS_USER || 'deploy' }}
+            IdentityFile ~/.ssh/deploy_key
+            ServerAliveInterval 30
+          EOF
+
+      - name: Upload compose + Caddy config
+        if: env.HAS_VPS == 'true'
+        run: scp deploy/vps/docker-compose.yml deploy/vps/Caddyfile vps:${APP_DIR}/
+
+      - name: Pull images, migrate, restart
+        if: env.HAS_VPS == 'true'
+        env:
+          WEB_IMAGE: ${{ needs.images.outputs.web }}
+          MIGRATOR_IMAGE: ${{ needs.images.outputs.migrator }}
+          TAG: ${{ github.sha }}
         run: |
-          sed -i "s#ghcr.io/OWNER/#ghcr.io/${{ github.repository_owner }}/#g" k8s/*.yaml
-          sed -i "s#premiumshopy-web:latest#premiumshopy-web:${{ github.sha }}#" k8s/20-web.yaml
-          kubectl apply -f k8s/00-namespace-config.yaml -f k8s/10-postgres.yaml -f k8s/15-storage.yaml -f k8s/30-ingress.yaml
-      - name: Migrate database
+          # Short-lived registry login (token piped via stdin, never on the command line)
+          echo "${{ secrets.GITHUB_TOKEN }}" | ssh vps "docker login ghcr.io -u ${{ github.actor }} --password-stdin"
+          ssh vps "cd ${APP_DIR} && export WEB_IMAGE=${WEB_IMAGE} MIGRATOR_IMAGE=${MIGRATOR_IMAGE} TAG=${TAG} && \
+            docker compose --profile tools pull web migrate && \
+            docker compose up -d db && \
+            docker compose run --rm migrate && \
+            docker compose up -d --remove-orphans web caddy && \
+            { grep -vE '^(WEB_IMAGE|MIGRATOR_IMAGE|TAG)=' .env; printf 'WEB_IMAGE=%s\nMIGRATOR_IMAGE=%s\nTAG=%s\n' ${WEB_IMAGE} ${MIGRATOR_IMAGE} ${TAG}; } > .env.next && \
+            mv .env.next .env && chmod 600 .env && \
+            docker image prune -f >/dev/null; \
+            docker logout ghcr.io >/dev/null"
+
+      - name: Health check
+        if: env.HAS_VPS == 'true'
         run: |
-          kubectl -n premiumshopy delete job db-migrate --ignore-not-found
-          sed -i "s#premiumshopy-migrator:latest#premiumshopy-migrator:${{ github.sha }}#" k8s/40-migrate-job.yaml
-          kubectl apply -f k8s/40-migrate-job.yaml
-          kubectl -n premiumshopy wait --for=condition=complete job/db-migrate --timeout=300s
-      - name: Rolling update
-        run: |
-          kubectl apply -f k8s/20-web.yaml
-          kubectl -n premiumshopy rollout status deployment/web --timeout=300s
+          for i in $(seq 1 30); do
+            if ssh vps "cd ${APP_DIR} && docker compose exec -T web wget -qO- 'http://127.0.0.1:3000/api/health?ready=1'"; then
+              echo; echo "✓ Healthy"; exit 0
+            fi
+            sleep 4
+          done
+          ssh vps "cd ${APP_DIR} && docker compose logs --tail=80 web"
+          exit 1

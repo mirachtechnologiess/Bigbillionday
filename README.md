@@ -15,7 +15,7 @@ A premium watch store built with Next.js 15 (App Router, JavaScript), PostgreSQL
 ## Architecture
 
 ```
-Browser ──► Ingress (nginx, TLS, brotli) ──► web pods (Next.js standalone, HPA 2→10)
+Browser ──► Caddy (TLS, gzip) ──► web container (Next.js standalone)
                                                 │   ├─ Storefront (RSC + ISR/caching)
                                                 │   ├─ /admin (protected by middleware + requireAdmin)
                                                 │   ├─ /api/*  (route handlers)
@@ -40,8 +40,9 @@ src/
   lib/
     db.js auth.js session-token.js api.js settings.js catalog.js pricing.js storage.js ai.js cart-store.js utils.js
 prisma/  schema.prisma, migrations, seed.mjs
-k8s/     namespace+config, postgres, storage, web (+HPA/PDB), ingress, migrate job
-.github/workflows/deploy.yml  CI/CD
+deploy/vps/  production: compose file, Caddyfile, one-time setup.sh, guide
+k8s/     future scale-out: namespace+config, postgres, storage, web (+HPA/PDB), ingress, migrate job
+.github/workflows/deploy.yml  CI/CD → VPS
 ```
 
 ### Order flow (COD)
@@ -78,21 +79,23 @@ On Windows keep `DATABASE_URL` on `127.0.0.1`, not `localhost`. Docker Desktop m
 
 Default admin: `ADMIN_EMAIL` / `ADMIN_PASSWORD` from `.env`. **Change the password after first login.**
 
-## Single-server deploy (Docker Compose)
+## Production deploy: Namecheap VPS (current)
+
+The store runs on a single small VPS with Docker Compose (Caddy HTTPS, Next.js, PostgreSQL). GitHub Actions builds the images, and every push to `main` deploys automatically. The full step-by-step guide is in **[deploy/vps/README.md](deploy/vps/README.md)**:
+1. run `deploy/vps/setup.sh` once on the server
+2. point DNS to the server
+3. add the `VPS_HOST` / `VPS_USER` / `VPS_SSH_KEY` secrets in GitHub
+4. push
+
+## Local Docker run
 
 ```bash
 docker compose --profile app up -d --build
 ```
 
-## Kubernetes deploy (auto via GitHub)
+## Kubernetes (later, for scale)
 
-1. Create a GitHub repo and push this project to `main`.
-2. Set up a cluster with **ingress-nginx**, **cert-manager**, **metrics-server** (for HPA), and a **ReadWriteMany** storage class (NFS/Longhorn/EFS/Filestore). Set it in `k8s/15-storage.yaml`.
-3. Create the secrets shown in `k8s/00-namespace-config.yaml`.
-4. Add repo secret `KUBE_CONFIG` (base64 kubeconfig).
-5. Point DNS for `bigbillionday.store` and `www` at the ingress IP.
-
-From then on, every push to `main` runs these steps: lint, build, push the web and migrator images to GHCR, run DB migrations as a Job, then a zero-downtime rolling update (`maxUnavailable: 0`, readiness probe on `/api/health?ready=1`). The HPA scales between 2 and 10 pods on CPU and memory.
+When traffic outgrows one server, `k8s/` has manifests for autoscaling (2→10 pods), a shared uploads volume, an ingress with TLS, and a migrate Job. These need a multi-node cluster and are not used by the current CI workflow.
 
 ## Performance notes (Core Web Vitals)
 - LCP: the hero headline is real HTML, and the 3D canvas mounts after idle, only while it is in view. On reduced-motion, low-end and mobile devices it shows a static poster or a lighter mesh.
