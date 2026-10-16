@@ -1,0 +1,303 @@
+/* ───────── Hero headline: per-line mask reveal (pure CSS so it runs before hydration) ───────── */
+.line {
+  display: block;
+  overflow: hidden;
+  padding-bottom: 0.08em;
+  margin-bottom: -0.08em;
+}
+.lineInner {
+  display: block;
+  transform: translate3d(0, 105%, 0) rotate(2deg);
+  transform-origin: 0 100%;
+  animation: lineUp 1.1s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+@keyframes lineUp {
+  to {
+    transform: translate3d(0, 0, 0) rotate(0);
+  }
+}
+.fadeIn {
+  opacity: 0;
+  animation: fadeIn 1s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 12px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.shimmer {
+  animation: goldShift 7s ease-in-out infinite alternate;
+}
+@keyframes goldShift {
+  from {
+    background-position: 0% 50%;
+  }
+  to {
+    background-position: 100% 50%;
+  }
+}
+
+/* Concentric guide rings behind the hero watch (light theme) */
+.rings {
+  position: absolute;
+  pointer-events: none;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  border: 1px solid rgb(17 24 39 / 0.07);
+}
+.rings::before,
+.rings::after {
+  content: "";
+  position: absolute;
+  border-radius: 50%;
+}
+.rings::before {
+  inset: 12%;
+  border: 1px dashed rgb(242 96 12 / 0.22);
+}
+.rings::after {
+  inset: -14%;
+  border: 1px solid rgb(17 24 39 / 0.045);
+}
+.spin {
+  animation: spin 120s linear infinite;
+}
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.poster {
+  transition: opacity 1.2s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.posterGlow {
+  animation: breathe 6s ease-in-out infinite;
+}
+@keyframes breathe {
+  0%,
+  100% {
+    opacity: 0.7;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.05);
+  }
+}
+.secondHand {
+  transform-origin: 200px 200px;
+  animation: spin 60s linear infinite;
+}
+
+/* Scroll cue */
+.cue {
+  position: relative;
+  width: 1px;
+  height: 48px;
+  overflow: hidden;
+  background: rgb(17 24 39 / 0.12);
+}
+.cue::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom, transparent, var(--color-gold));
+  animation: cue 2.2s cubic-bezier(0.65, 0, 0.35, 1) infinite;
+}
+@keyframes cue {
+  from {
+    transform: translateY(-100%);
+  }
+  to {
+    transform: translateY(100%);
+  }
+}
+
+/* ───────── Ad banner carousel ───────── */
+.slide {
+  position: relative;
+  isolation: isolate;
+}
+/* Solid colour + a quiet pattern (no gradients). */
+.slide::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  opacity: 0.14;
+  pointer-events: none;
+}
+.patStripes::before {
+  background-image: repeating-linear-gradient(135deg, #fff 0 2px, transparent 2px 22px);
+}
+.patDots::before {
+  background-image: radial-gradient(#fff 1.6px, transparent 1.8px);
+  background-size: 18px 18px;
+}
+.patDotsDark::before {
+  background-image: radial-gradient(#15171c 1.4px, transparent 1.6px);
+  background-size: 18px 18px;
+  opacity: 0.1;
+}
+.patChecks::before {
+  background-image: linear-gradient(90deg, #fff 1px, transparent 1px), linear-gradient(#fff 1px, transparent 1px);
+  background-size: 28px 28px;
+  opacity: 0.1;
+}
+/* Big decorative ring top-right */
+.slide::after {
+  content: "";
+  position: absolute;
+  right: -8%;
+  top: -40%;
+  width: 52%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  border: 36px solid rgb(255 255 255 / 0.1);
+  z-index: -1;
+  pointer-events: none;
+}
+
+.stamp {
+  animation: stamp 0.7s cubic-bezier(0.2, 1.4, 0.4, 1) both;
+}
+@keyframes stamp {
+  0% {
+    opacity: 0;
+    transform: scale(1.9) rotate(-8deg);
+  }
+  60% {
+    opacity: 1;
+    transform: scale(0.94) rotate(-2deg);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) rotate(-2deg);
+  }
+}
+.rise {
+  animation: rise 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 18px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.popIn {
+  animation: popIn 0.7s cubic-bezier(0.2, 1.3, 0.4, 1) both;
+}
+@keyframes popIn {
+  from {
+    opacity: 0;
+    transform: translate3d(40px, 20px, 0) scale(0.85) rotate(var(--rot, 0deg));
+  }
+  to {
+    opacity: 1;
+    transform: rotate(var(--rot, 0deg));
+  }
+}
+.tagIn {
+  animation: tagIn 0.55s cubic-bezier(0.2, 1.4, 0.4, 1) both;
+}
+@keyframes tagIn {
+  from {
+    opacity: 0;
+    transform: translate3d(-16px, 0, 0) rotate(-14deg) scale(0.7);
+  }
+  to {
+    opacity: 1;
+    transform: rotate(-6deg);
+  }
+}
+.strike {
+  position: relative;
+}
+.strike::after {
+  content: "";
+  position: absolute;
+  left: -2px;
+  right: -2px;
+  top: 52%;
+  height: 2px;
+  background: currentColor;
+  transform-origin: left;
+  animation: strike 0.5s 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+@keyframes strike {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+.progress {
+  transform-origin: left;
+  animation: progress linear forwards;
+}
+@keyframes progress {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+.paused .progress {
+  animation-play-state: paused;
+}
+
+/* Horizontal native scrollers: hide scrollbar */
+.noBar {
+  scrollbar-width: none;
+}
+.noBar::-webkit-scrollbar {
+  display: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lineInner,
+  .fadeIn,
+  .stamp,
+  .rise,
+  .popIn,
+  .tagIn {
+    animation: none;
+    opacity: 1;
+  }
+  .lineInner,
+  .fadeIn,
+  .rise {
+    transform: none;
+  }
+  .stamp {
+    transform: rotate(-2deg);
+  }
+  .tagIn {
+    transform: rotate(-6deg);
+  }
+  .popIn {
+    transform: rotate(var(--rot, 0deg));
+  }
+  .strike::after {
+    animation: none;
+  }
+  .spin,
+  .secondHand,
+  .posterGlow,
+  .shimmer,
+  .progress {
+    animation: none;
+  }
+}

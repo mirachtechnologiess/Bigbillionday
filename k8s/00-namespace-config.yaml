@@ -1,0 +1,32 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: premiumshopy
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: web-config
+  namespace: premiumshopy
+data:
+  NEXT_PUBLIC_SITE_URL: "https://bigbillionday.store"
+  NVIDIA_BASE_URL: "https://integrate.api.nvidia.com/v1"
+  NVIDIA_TEXT_MODEL: "nvidia/nemotron-3-super-120b-a12b"
+  NVIDIA_VISION_MODEL: "nvidia/nemotron-3.5-super-vl-120b-a12b"
+  UPLOAD_DIR: "/app/storage/uploads"
+---
+# Secrets are NOT committed. Create them once per cluster:
+#
+#   kubectl -n premiumshopy create secret generic web-secrets \
+#     --from-literal=DATABASE_URL='postgresql://premiumshopy:<pw>@postgres:5432/premiumshopy?schema=public' \
+#     --from-literal=AUTH_SECRET='<48+ random chars>' \
+#     --from-literal=NVIDIA_API_KEY='<nvapi-...>' \
+#     --from-literal=ADMIN_EMAIL='admin@bigbillionday.store' \
+#     --from-literal=ADMIN_PASSWORD='<strong password>' \
+#     --from-literal=RAZORPAY_KEY_ID='' --from-literal=RAZORPAY_KEY_SECRET=''
+#
+#   kubectl -n premiumshopy create secret generic postgres-secret --from-literal=POSTGRES_PASSWORD='<pw>'
+#
+#   # pull secret for GHCR (private repo):
+#   kubectl -n premiumshopy create secret docker-registry ghcr \
+#     --docker-server=ghcr.io --docker-username=<github-user> --docker-password=<PAT with read:packages>

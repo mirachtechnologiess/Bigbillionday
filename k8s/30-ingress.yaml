@@ -1,0 +1,36 @@
+# Requires ingress-nginx + cert-manager (ClusterIssuer "letsencrypt-prod").
+# Point DNS A records for bigbillionday.store and www.bigbillionday.store at the ingress load balancer IP.
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: letsencrypt-prod
+spec:
+  acme:
+    server: https://acme-v02.api.letsencrypt.org/directory
+    email: admin@bigbillionday.store
+    privateKeySecretRef: { name: letsencrypt-prod }
+    solvers: [{ http01: { ingress: { ingressClassName: nginx } } }]
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: web
+  namespace: premiumshopy
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    nginx.ingress.kubernetes.io/proxy-body-size: "25m"
+    nginx.ingress.kubernetes.io/from-to-www-redirect: "true"
+    nginx.ingress.kubernetes.io/enable-brotli: "true"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "120"
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts: [bigbillionday.store, www.bigbillionday.store]
+      secretName: bigbillionday-tls
+  rules:
+    - host: bigbillionday.store
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend: { service: { name: web, port: { name: http } } }

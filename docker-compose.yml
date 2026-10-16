@@ -1,0 +1,47 @@
+# Local / single-server deployment:  docker compose up -d --build
+# Dev DB only:                       docker compose up -d db
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: premiumshopy
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-premiumshopy}
+      POSTGRES_DB: premiumshopy
+    ports: ["5432:5432"]
+    volumes: [pgdata:/var/lib/postgresql/data]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U premiumshopy"]
+      interval: 5s
+      retries: 10
+
+  migrate:
+    build: { context: ., target: migrator }
+    profiles: ["app"]
+    depends_on: { db: { condition: service_healthy } }
+    environment:
+      DATABASE_URL: postgresql://premiumshopy:${POSTGRES_PASSWORD:-premiumshopy}@db:5432/premiumshopy?schema=public
+      RUN_SEED: "true"
+      ADMIN_EMAIL: ${ADMIN_EMAIL:-admin@bigbillionday.store}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:-ChangeMe@123}
+    volumes: [uploads:/app/storage/uploads]
+
+  web:
+    build:
+      context: .
+      target: runner
+      args: { NEXT_PUBLIC_SITE_URL: "${NEXT_PUBLIC_SITE_URL:-https://bigbillionday.store}" }
+    profiles: ["app"]
+    restart: unless-stopped
+    depends_on:
+      migrate: { condition: service_completed_successfully }
+    env_file: [.env]
+    environment:
+      DATABASE_URL: postgresql://premiumshopy:${POSTGRES_PASSWORD:-premiumshopy}@db:5432/premiumshopy?schema=public
+      UPLOAD_DIR: /app/storage/uploads
+    ports: ["3000:3000"]
+    volumes: [uploads:/app/storage/uploads]
+
+volumes:
+  pgdata:
+  uploads:

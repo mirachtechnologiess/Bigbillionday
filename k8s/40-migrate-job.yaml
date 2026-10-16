@@ -1,0 +1,25 @@
+# Run by CI before each rollout (deleted + recreated with the new image tag).
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: db-migrate
+  namespace: premiumshopy
+spec:
+  backoffLimit: 2
+  ttlSecondsAfterFinished: 600
+  template:
+    spec:
+      restartPolicy: Never
+      imagePullSecrets: [{ name: ghcr }]
+      containers:
+        - name: migrate
+          image: ghcr.io/OWNER/premiumshopy-migrator:latest
+          envFrom:
+            - configMapRef: { name: web-config }
+            - secretRef: { name: web-secrets }
+          env:
+            - { name: RUN_SEED, value: "true" } # idempotent: creates admin/brands, demo catalog only when empty
+          volumeMounts: [{ name: uploads, mountPath: /app/storage/uploads }]
+      volumes:
+        - name: uploads
+          persistentVolumeClaim: { claimName: uploads }

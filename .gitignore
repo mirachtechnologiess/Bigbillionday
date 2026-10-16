@@ -18,15 +18,20 @@
 # misc
 .DS_Store
 *.pem
+*.log
 
 # debug
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
-# local env files
+# local env files (secrets: NVIDIA key, AUTH_SECRET, DB password)
 .env*.local
 .env
+
+# uploaded media lives on a persistent volume, not in git
+storage/*
+!storage/.gitkeep
 
 # vercel
 .vercel

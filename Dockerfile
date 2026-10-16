@@ -1,0 +1,51 @@
+# syntax=docker/dockerfile:1.7
+# Multi-stage build → small standalone Next.js runtime image.
+#   target "runner"   : the web app (default)
+#   target "migrator" : runs `prisma migrate deploy` (+ optional seed) as a K8s Job / compose one-shot
+
+ARG NODE_VERSION=22-alpine
+
+FROM node:${NODE_VERSION} AS base
+RUN apk add --no-cache libc6-compat openssl
+WORKDIR /app
+ENV NEXT_TELEMETRY_DISABLED=1
+
+# ---------- deps ----------
+FROM base AS deps
+COPY package.json package-lock.json ./
+COPY prisma ./prisma
+RUN --mount=type=cache,target=/root/.npm npm ci
+
+# ---------- build ----------
+FROM base AS builder
+COPY --from=deps /app/node_modules ./node_modules
+COPY . .
+ARG NEXT_PUBLIC_SITE_URL=https://bigbillionday.store
+ENV NEXT_PUBLIC_SITE_URL=${NEXT_PUBLIC_SITE_URL}
+# Build-time DB access is not required: pages fall back gracefully and revalidate at runtime.
+ENV DATABASE_URL=postgresql://build:build@localhost:5432/build
+RUN npx prisma generate && npm run build
+
+# ---------- migrator ----------
+FROM base AS migrator
+COPY --from=deps /app/node_modules ./node_modules
+COPY package.json ./
+COPY prisma ./prisma
+ENV UPLOAD_DIR=/app/storage/uploads
+CMD ["sh", "-c", "npx prisma migrate deploy && if [ \"$RUN_SEED\" = \"true\" ]; then node prisma/seed.mjs; fi"]
+
+# ---------- runner ----------
+FROM base AS runner
+ENV NODE_ENV=production \
+    PORT=3000 \
+    HOSTNAME=0.0.0.0 \
+    UPLOAD_DIR=/app/storage/uploads
+RUN addgroup -S -g 1001 nodejs && adduser -S -u 1001 -G nodejs nextjs \
+ && mkdir -p /app/storage/uploads /app/.next/cache && chown -R nextjs:nodejs /app
+COPY --from=builder --chown=nextjs:nodejs /app/public ./public
+COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
+COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
+USER nextjs
+EXPOSE 3000
+HEALTHCHECK --interval=30s --timeout=5s --start-period=20s CMD wget -qO- http://127.0.0.1:3000/api/health || exit 1
+CMD ["node", "server.js"]

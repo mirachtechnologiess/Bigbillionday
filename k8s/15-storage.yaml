@@ -1,0 +1,11 @@
+# Product images are shared by every replica, so the uploads volume must be ReadWriteMany
+# (NFS, Longhorn, AWS EFS, GCP Filestore, Azure Files...). Set storageClassName for your cluster.
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: uploads
+  namespace: premiumshopy
+spec:
+  accessModes: ["ReadWriteMany"]
+  # storageClassName: nfs-client
+  resources: { requests: { storage: 20Gi } }

@@ -1,0 +1,7 @@
+{
+  // This workspace pushes as the GitHub account "mirachtechnologiess".
+  // Stop VS Code from injecting its own signed-in GitHub account (baytecai) into git,
+  // so Git Credential Manager uses the per-repo mirachtechnologiess login instead.
+  "github.gitAuthentication": false,
+  "git.terminalAuthentication": false
+}

@@ -1,0 +1,39 @@
+.root {
+  position: relative;
+  display: flex;
+  overflow: hidden;
+  user-select: none;
+  gap: var(--gap, 0px);
+}
+.track {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: var(--gap, 0px);
+  min-width: 100%;
+  animation: scroll var(--duration, 40s) linear infinite;
+  will-change: transform;
+}
+.reverse .track {
+  animation-direction: reverse;
+}
+.pause:hover .track {
+  animation-play-state: paused;
+}
+.fade {
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 7%, #000 93%, transparent);
+  mask-image: linear-gradient(90deg, transparent, #000 7%, #000 93%, transparent);
+}
+@keyframes scroll {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(calc(-100% - var(--gap, 0px)), 0, 0);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .track {
+    animation: none;
+  }
+}

@@ -1,0 +1,6 @@
+# Keep LF everywhere so Docker/Linux CI see identical files
+* text=auto eol=lf
+*.png binary
+*.jpg binary
+*.webp binary
+*.ico binary
