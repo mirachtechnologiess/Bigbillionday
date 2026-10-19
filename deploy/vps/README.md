@@ -64,7 +64,7 @@ Then go to **Actions → CI / CD → Run workflow** (or just push to `main`). It
 ```bash
 ssh deploy@YOUR_SERVER_IP
 cd /opt/bigbillionday
-docker compose run --rm migrate node scripts/import-legacy.mjs
+docker compose run --rm -T migrate node scripts/import-legacy.mjs
 ```
 This imports all products and photos from the old premiumshopy.com in about 1–2 minutes. Then open **https://bigbillionday.store** for the store. The admin panel is at **https://admin.bigbillionday.store**; log in with the admin password from step 2. Visiting bigbillionday.store/admin also redirects there.
 

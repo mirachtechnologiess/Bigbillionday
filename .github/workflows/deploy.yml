@@ -147,7 +147,7 @@ jobs:
           step "Database up"
           docker compose up -d --wait db
           step "Migrate + seed"
-          docker compose run --rm migrate
+          docker compose run --rm -T migrate </dev/null
           step "Start web + caddy"
           docker compose up -d --remove-orphans web caddy
           step "Prune old images"
