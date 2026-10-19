@@ -68,6 +68,10 @@ services:
     depends_on:
       db: { condition: service_healthy }
     expose: ["3000"]
+    # Least privilege: no Linux capabilities, no setuid escalation (the app runs as non-root "nextjs").
+    cap_drop: [ALL]
+    security_opt: ["no-new-privileges:true"]
+    pids_limit: 200
     mem_limit: 640m
     logging: *logging
 

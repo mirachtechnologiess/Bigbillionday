@@ -7,7 +7,8 @@ const nextConfig = {
     formats: ["image/avif", "image/webp"],
     deviceSizes: [360, 480, 640, 828, 1080, 1280, 1600, 1920],
     minimumCacheTTL: 60 * 60 * 24 * 30,
-    remotePatterns: [{ protocol: "https", hostname: "**" }],
+    // All images are local uploads (/uploads) — no remote hosts, so the optimizer can't be used as an open proxy.
+    remotePatterns: [],
   },
   experimental: {
     optimizePackageImports: ["lucide-react", "framer-motion", "recharts", "@react-three/drei"],

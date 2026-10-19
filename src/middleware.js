@@ -16,7 +16,7 @@ const SITE_HOST = (() => {
   }
 })();
 // Never rewritten on the admin host: APIs, Next assets, uploaded media and static files (logo.png, icon.png…)
-const PASSTHROUGH = /^\/(api|_next|uploads)(\/|$)|\.[a-z0-9]{2,5}$/i;
+const PASSTHROUGH = /^\/(api|_next|uploads)(\/|$)|\.[a-z0-9]+$/i;
 
 const isAdminPath = (p) => p === "/admin" || p.startsWith("/admin/");
 
