@@ -131,15 +131,28 @@ jobs:
         run: |
           # Short-lived registry login (token piped via stdin, never on the command line)
           echo "${{ secrets.GITHUB_TOKEN }}" | ssh vps "docker login ghcr.io -u ${{ github.actor }} --password-stdin"
-          ssh vps "cd ${APP_DIR} && export WEB_IMAGE=${WEB_IMAGE} MIGRATOR_IMAGE=${MIGRATOR_IMAGE} TAG=${TAG} && \
-            docker compose --profile tools pull web migrate && \
-            docker compose up -d db && \
-            docker compose run --rm migrate && \
-            docker compose up -d --remove-orphans web caddy && \
-            { grep -vE '^(WEB_IMAGE|MIGRATOR_IMAGE|TAG)=' .env; printf 'WEB_IMAGE=%s\nMIGRATOR_IMAGE=%s\nTAG=%s\n' ${WEB_IMAGE} ${MIGRATOR_IMAGE} ${TAG}; } > .env.next && \
-            mv .env.next .env && chmod 600 .env && \
-            docker image prune -f >/dev/null; \
-            docker logout ghcr.io >/dev/null"
+          # Every step is echoed and the script stops at the first failure (set -e), so a failing
+          # step can never be masked; the registry logout always runs via trap.
+          ssh vps "APP_DIR=${APP_DIR} WEB_IMAGE=${WEB_IMAGE} MIGRATOR_IMAGE=${MIGRATOR_IMAGE} TAG=${TAG} bash -s" <<'DEPLOY'
+          set -euo pipefail
+          trap 'docker logout ghcr.io >/dev/null 2>&1 || true' EXIT
+          export WEB_IMAGE MIGRATOR_IMAGE TAG
+          cd "$APP_DIR"
+          step() { echo; echo "▶ $*"; }
+          step "Record deployed version in .env"
+          { grep -vE '^(WEB_IMAGE|MIGRATOR_IMAGE|TAG)=' .env || true; printf 'WEB_IMAGE=%s\nMIGRATOR_IMAGE=%s\nTAG=%s\n' "$WEB_IMAGE" "$MIGRATOR_IMAGE" "$TAG"; } > .env.next
+          mv .env.next .env && chmod 600 .env
+          step "Pull images ($TAG)"
+          docker compose --profile tools pull web migrate
+          step "Database up"
+          docker compose up -d --wait db
+          step "Migrate + seed"
+          docker compose run --rm migrate
+          step "Start web + caddy"
+          docker compose up -d --remove-orphans web caddy
+          step "Prune old images"
+          docker image prune -f >/dev/null
+          DEPLOY
 
       - name: Health check
         if: env.HAS_VPS == 'true'
