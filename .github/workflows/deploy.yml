@@ -138,6 +138,9 @@ jobs:
           trap 'docker logout ghcr.io >/dev/null 2>&1 || true' EXIT
           export WEB_IMAGE MIGRATOR_IMAGE TAG
           cd "$APP_DIR"
+          # Keep a copy of every deploy's output on the server (CI job logs need a GitHub login to read)
+          exec > >(tee -a deploy.log) 2>&1
+          echo "===== deploy $TAG $(date -u +%FT%TZ) ====="
           step() { echo; echo "▶ $*"; }
           step "Record deployed version in .env"
           { grep -vE '^(WEB_IMAGE|MIGRATOR_IMAGE|TAG)=' .env || true; printf 'WEB_IMAGE=%s\nMIGRATOR_IMAGE=%s\nTAG=%s\n' "$WEB_IMAGE" "$MIGRATOR_IMAGE" "$TAG"; } > .env.next

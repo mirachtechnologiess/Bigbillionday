@@ -35,7 +35,7 @@ RUN npx prisma generate && npm run build
 # Slim one-shot image: only what migrations, seeding and the catalog importer need (~1/5 the size
 # of copying the full node_modules), so it pulls quickly on a small VPS.
 FROM base AS migrator
-RUN npm init -y >/dev/null  && npm install --omit=dev --no-audit --no-fund prisma@6.19.3 @prisma/client@6.19.3 bcryptjs@3.0.2 sharp@0.35.5  && npm cache clean --force
+RUN npm init -y >/dev/null  && npm install --omit=dev --no-audit --no-fund prisma@6.19.3 @prisma/client@6.19.3 bcryptjs@3.0.2 sharp@0.34.5  && npm cache clean --force
 COPY prisma ./prisma
 COPY scripts ./scripts
 RUN npx prisma generate
