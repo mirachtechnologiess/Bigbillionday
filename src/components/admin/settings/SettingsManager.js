@@ -9,6 +9,7 @@ import { api } from "@/components/admin/fetcher";
 import { Card, Field, ImagePicker, PageHeader, Pill, Spinner, Tabs, Toggle, useQueryState } from "@/components/admin/ui";
 import { cn, formatINR } from "@/lib/utils";
 import { SeoPreview } from "@/components/admin/brands/shared";
+import NvidiaKeyCard from "@/components/admin/settings/NvidiaKeyCard";
 
 const GROUPS = {
   store: { label: "Store", icon: Store, blurb: "Identity and contact details shown in the header, footer, invoices and emails." },
@@ -161,21 +162,7 @@ export default function SettingsManager({ initial, defaults, tab: initialTab, is
         <Card title={`${GROUPS[tab].label}`} icon={GROUPS[tab].icon} actions={dirty && <Pill tone="gold">Unsaved changes</Pill>} bodyClass="!p-0">
           <p className="border-b border-line px-4 py-3 text-[12.5px] text-mute">{GROUPS[tab].blurb}</p>
 
-          {tab === "ai" && (
-            <div className={cn("mx-4 mt-4 flex items-start gap-3 rounded-xl border p-3", aiConfigured ? "border-lume/25 bg-lume/[.05]" : "border-danger/30 bg-danger/[.05]")}>
-              <KeyRound className={cn("mt-0.5 h-4 w-4 flex-none", aiConfigured ? "text-lume" : "text-danger")} />
-              <div className="min-w-0 text-[12.5px]">
-                <div className="flex items-center gap-2 font-semibold">
-                  NVIDIA_API_KEY <Pill tone={aiConfigured ? "lume" : "danger"}>{aiConfigured ? "Configured" : "Not configured"}</Pill>
-                </div>
-                <p className="mt-1 text-mute">
-                  {aiConfigured
-                    ? "AI features are available. The key itself is stored on the server and never shown here."
-                    : "Set NVIDIA_API_KEY in the server environment and restart. Until then AI toggles below have no effect."}
-                </p>
-              </div>
-            </div>
-          )}
+          {tab === "ai" && <NvidiaKeyCard isAdmin={isAdmin} />}
 
           <fieldset disabled={!isAdmin} className="grid gap-x-4 gap-y-5 p-4 sm:grid-cols-2">
             {keys.map((k) => (

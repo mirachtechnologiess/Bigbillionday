@@ -61,7 +61,9 @@ function merge(base, over) {
 /** All settings merged over defaults. Cached per request. */
 const loadSettings = unstable_cache(
   async () => {
-    const rows = await db.setting.findMany();
+    // Only the known public groups — secret:* rows (API keys) must never reach getSettings(),
+    // whose result is passed to client components such as the storefront header.
+    const rows = await db.setting.findMany({ where: { key: { in: Object.keys(DEFAULT_SETTINGS) } } });
     return Object.fromEntries(rows.map((r) => [r.key, r.value]));
   },
   ["settings"],

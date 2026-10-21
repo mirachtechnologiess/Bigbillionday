@@ -77,7 +77,7 @@ export default async function ReviewsPage({ searchParams }) {
       page={page}
       pages={Math.max(1, Math.ceil(total / per))}
       total={total}
-      aiOn={aiEnabled()}
+      aiOn={await aiEnabled()}
       unclassified={unclassifiedPending}
       isAdmin={me.role === "ADMIN"}
     />

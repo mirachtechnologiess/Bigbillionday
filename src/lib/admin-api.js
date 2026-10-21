@@ -18,7 +18,7 @@ export function adminRoute(fn, { role, ai = false, aiLimit = 30 } = {}) {
     const user = await requireAdmin();
     if (role === "ADMIN" && user.role !== "ADMIN") throw new HttpError(403, "Only an ADMIN can perform this action");
     if (ai) {
-      if (!aiEnabled()) throw new HttpError(503, "AI is not configured — set NVIDIA_API_KEY");
+      if (!(await aiEnabled())) throw new HttpError(503, "AI is not configured — add the NVIDIA API key in Settings → AI");
       rateLimit(`ai:${user.id}`, aiLimit, 60_000);
     }
     const params = ctx?.params ? await ctx.params : {};

@@ -96,7 +96,7 @@ export async function cancelOrder(orderId, note = "Cancelled by customer") {
 /* ───────────────────────── COD risk (AI, best-effort) ───────────────────────── */
 
 export async function scoreCodRisk(orderId) {
-  if (!aiEnabled()) return;
+  if (!(await aiEnabled())) return;
   try {
     const order = await db.order.findUnique({ where: { id: orderId }, include: { items: true, user: { select: { name: true } } } });
     if (!order || order.paymentMethod !== "COD") return;

@@ -24,7 +24,7 @@ export default async function PanelLayout({ children }) {
   const user = await requireAdminPage();
   const [badges, settings] = await Promise.all([badgeCounts(), getSettings()]);
   return (
-    <AdminShell user={{ name: user.name, role: user.role, email: user.email }} badges={badges} storeName={settings.store.name} aiOn={aiEnabled()}>
+    <AdminShell user={{ name: user.name, role: user.role, email: user.email }} badges={badges} storeName={settings.store.name} aiOn={await aiEnabled()}>
       {children}
     </AdminShell>
   );

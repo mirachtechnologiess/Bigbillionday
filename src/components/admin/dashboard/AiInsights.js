@@ -59,7 +59,7 @@ export default function AiInsights({ aiOn }) {
           <p className="max-w-md text-[12.5px] text-mute">
             {aiOn
               ? "Let the analyst read your last 30 days (sellers, slow movers, stock-outs, cancellations by pincode) and suggest what to do next."
-              : "Set NVIDIA_API_KEY to enable AI insights."}
+              : "Add the NVIDIA key in Settings → AI to enable insights."}
           </p>
           {busy && <div className="a-scan mt-2 h-1 w-40 rounded bg-ink-4" />}
         </div>

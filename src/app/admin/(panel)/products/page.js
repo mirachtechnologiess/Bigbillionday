@@ -17,7 +17,7 @@ export default async function ProductsPage({ searchParams }) {
     listProducts(sp),
     db.brand.findMany({ orderBy: { name: "asc" }, select: { id: true, name: true } }),
     db.product.groupBy({ by: ["status"], _count: true }),
-    Promise.resolve(aiEnabled()),
+    aiEnabled(),
   ]);
   const counts = Object.fromEntries(statusCounts.map((s) => [s.status, s._count]));
   counts.ALL = statusCounts.reduce((a, s) => a + s._count, 0);

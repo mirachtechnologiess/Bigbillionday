@@ -1,6 +1,7 @@
 import "server-only";
 import OpenAI from "openai";
 import { db } from "./db";
+import { readSecret } from "./secrets";
 
 /**
  * NVIDIA NIM exposes an OpenAI-compatible API, so we reuse the OpenAI SDK.
@@ -8,9 +9,9 @@ import { db } from "./db";
  * Vision: Nemotron 3.5 Super VL 120B.
  * NVIDIA retires hosted models regularly (404/410), so each call walks a fallback chain.
  */
-const client = () =>
+const client = (apiKey) =>
   new OpenAI({
-    apiKey: process.env.NVIDIA_API_KEY,
+    apiKey,
     baseURL: process.env.NVIDIA_BASE_URL || "https://integrate.api.nvidia.com/v1",
     timeout: 90_000,
     maxRetries: 1,
@@ -21,7 +22,59 @@ export const VISION_MODEL = process.env.NVIDIA_VISION_MODEL || "nvidia/nemotron-
 const TEXT_FALLBACKS = [TEXT_MODEL, "nvidia/nemotron-3.5-super-vl-120b-a12b", "meta/llama-3.2-11b-vision-instruct"];
 const VISION_FALLBACKS = [VISION_MODEL, "meta/llama-3.2-11b-vision-instruct", "meta/llama-3.2-90b-vision-instruct"];
 
-export const aiEnabled = () => Boolean(process.env.NVIDIA_API_KEY);
+// The key can be set in Admin → Settings → AI (stored encrypted, see lib/secrets.js) or via the
+// NVIDIA_API_KEY env var. The admin-set key wins. Cached briefly so each AI call doesn't hit the DB.
+let keyCache = { at: 0, value: null, source: null };
+const KEY_TTL_MS = 30_000;
+
+export async function getNvidiaKey() {
+  if (Date.now() - keyCache.at < KEY_TTL_MS) return keyCache;
+  let value = null;
+  let source = null;
+  try {
+    const stored = await readSecret("nvidia_api_key");
+    if (stored?.value) [value, source] = [stored.value, "admin"];
+  } catch {}
+  if (!value && process.env.NVIDIA_API_KEY) [value, source] = [process.env.NVIDIA_API_KEY, "env"];
+  keyCache = { at: Date.now(), value, source };
+  return keyCache;
+}
+
+export const invalidateNvidiaKey = () => (keyCache = { at: 0, value: null, source: null });
+
+export async function aiEnabled() {
+  return Boolean((await getNvidiaKey()).value);
+}
+
+async function requireKey() {
+  const { value } = await getNvidiaKey();
+  if (!value) throw new Error("NVIDIA API key is not configured (Admin → Settings → AI)");
+  return value;
+}
+
+/**
+ * Validates a key against NVIDIA without saving it. The model list is public, so the real check is a
+ * tiny completion, tried along the same fallback chain the app uses (models get retired per account).
+ */
+export async function testNvidiaKey(apiKey) {
+  const tried = [];
+  for (const m of chain(TEXT_MODEL)) {
+    try {
+      const out = await client(apiKey).chat.completions.create({
+        model: m,
+        max_tokens: 5,
+        messages: [{ role: "user", content: "Reply OK" }],
+        chat_template_kwargs: { enable_thinking: false },
+      });
+      return { ok: true, textModel: m, fallback: m !== TEXT_MODEL, reply: (out.choices[0]?.message?.content || "OK").trim().slice(0, 20) };
+    } catch (e) {
+      if (e.status === 401 || e.status === 403) return { ok: false, error: "NVIDIA rejected this key (invalid, revoked or no access)" };
+      tried.push(`${m}: ${e.status || e.message}`);
+      if (!retriable(e)) break;
+    }
+  }
+  return { ok: false, error: `The key works but no AI model answered (${tried.join("; ")})` };
+}
 
 async function log(task, model, ok, tokens, error) {
   try {
@@ -49,11 +102,11 @@ function params(model, { system, messages, temperature, maxTokens, stream }) {
 
 /** Plain chat completion -> string. */
 export async function chat({ task = "chat", system, messages, model = TEXT_MODEL, temperature = 0.4, maxTokens = 1200 }) {
-  if (!aiEnabled()) throw new Error("NVIDIA_API_KEY is not configured");
+  const apiKey = await requireKey();
   let lastErr;
   for (const m of chain(model)) {
     try {
-      const res = await client().chat.completions.create(params(m, { system, messages, temperature, maxTokens, stream: false }));
+      const res = await client(apiKey).chat.completions.create(params(m, { system, messages, temperature, maxTokens, stream: false }));
       await log(task, m, true, res.usage?.total_tokens);
       return stripThink(res.choices[0]?.message?.content);
     } catch (e) {
@@ -67,11 +120,11 @@ export async function chat({ task = "chat", system, messages, model = TEXT_MODEL
 
 /** Streaming chat completion -> ReadableStream of UTF-8 text chunks. */
 export async function chatStream({ task = "chat-stream", system, messages, model = TEXT_MODEL, temperature = 0.5, maxTokens = 700 }) {
-  if (!aiEnabled()) throw new Error("NVIDIA_API_KEY is not configured");
+  const apiKey = await requireKey();
   let stream, used, lastErr;
   for (const m of chain(model)) {
     try {
-      stream = await client().chat.completions.create(params(m, { system, messages, temperature, maxTokens, stream: true }));
+      stream = await client(apiKey).chat.completions.create(params(m, { system, messages, temperature, maxTokens, stream: true }));
       used = m;
       break;
     } catch (e) {

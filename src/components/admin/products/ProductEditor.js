@@ -181,7 +181,7 @@ export default function ProductEditor({ product, meta, storeName, aiOn, isAdmin 
 
   /* ───────── AI: photo → listing ───────── */
   const runAutofill = async (imgs = formRef.current.images) => {
-    if (!aiOn) return toast.error("AI is offline — set NVIDIA_API_KEY");
+    if (!aiOn) return toast.error("AI is offline — add the NVIDIA key in Settings → AI");
     if (!imgs.length) return toast.error("Upload a photo first");
     setAiBusy("fill");
     const tid = toast.loading("Reading the watch… (vision model)");
@@ -246,7 +246,7 @@ export default function ProductEditor({ product, meta, storeName, aiOn, isAdmin 
   };
 
   const fieldAi = async (task, extra = {}) => {
-    if (!aiOn) return toast.error("AI is offline — set NVIDIA_API_KEY");
+    if (!aiOn) return toast.error("AI is offline — add the NVIDIA key in Settings → AI");
     if (!formRef.current.name && task !== "alt") return toast.error("Add a product name (or run Auto-fill) first");
     setAiBusy(task);
     try {
@@ -483,7 +483,7 @@ export default function ProductEditor({ product, meta, storeName, aiOn, isAdmin 
                 />
                 <Toggle checked={onlyEmpty} onChange={setOnlyEmpty} label={<span className="text-[12px]">Only fill empty fields</span>} />
               </div>
-              {!aiOn && <div className="border-t border-gold/15 px-4 py-2 text-[12px] text-ember">AI is offline: NVIDIA_API_KEY is not configured on the server.</div>}
+              {!aiOn && <div className="border-t border-gold/15 px-4 py-2 text-[12px] text-ember">AI is offline: NVIDIA key not set (Settings → AI).</div>}
               <AnimatePresence>
                 {aiInfo && (
                   <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="border-t border-gold/15">

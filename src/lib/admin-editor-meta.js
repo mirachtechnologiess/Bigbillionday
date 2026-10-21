@@ -11,5 +11,5 @@ export async function editorMeta() {
     db.collection.findMany({ orderBy: [{ sortOrder: "asc" }, { name: "asc" }], select: { id: true, name: true } }),
     getSettings(),
   ]);
-  return { meta: { brands, categories, collections }, storeName: settings.store.name, aiOn: aiEnabled() };
+  return { meta: { brands, categories, collections }, storeName: settings.store.name, aiOn: await aiEnabled() };
 }

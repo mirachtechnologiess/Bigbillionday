@@ -41,7 +41,7 @@ export default function AiStudio({ initialTab, aiOn, home, autoModeration, revie
         <div className="mb-4 flex items-start gap-3 rounded-xl border border-ember/30 bg-ember/5 p-3 text-[12.5px] text-bone-2">
           <Sparkles className="mt-0.5 h-4 w-4 flex-none text-ember" />
           <span>
-            AI features need <span className="font-mono text-bone">NVIDIA_API_KEY</span> on the server. Tools that call the model will return an error until it is set.
+            AI features need an NVIDIA API key (add it in Settings → AI). Tools that call the model will return an error until it is set.
           </span>
         </div>
       )}

@@ -226,7 +226,7 @@ export default function AdminShell({ user, badges, storeName, aiOn, children }) 
             </span>
           </button>
           <div className="ml-auto flex items-center gap-2">
-            <span className={cn("pill hidden md:inline-flex", "!h-7")} data-tone={aiOn ? "lume" : "mute"} title={aiOn ? "NVIDIA NIM connected" : "NVIDIA_API_KEY not set"}>
+            <span className={cn("pill hidden md:inline-flex", "!h-7")} data-tone={aiOn ? "lume" : "mute"} title={aiOn ? "NVIDIA NIM connected" : "NVIDIA key not set (Settings → AI)"}>
               AI {aiOn ? "online" : "offline"}
             </span>
             <a href={storeUrl("/")} target="_blank" rel="noreferrer" className="a-btn a-btn-ghost a-btn-sm">

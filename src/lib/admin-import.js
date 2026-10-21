@@ -220,4 +220,4 @@ export async function importRow(raw, options, ctx) {
   }
 }
 
-export const canEnrich = () => aiEnabled();
+export const canEnrich = () => aiEnabled(); // async

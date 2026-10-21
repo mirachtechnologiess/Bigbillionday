@@ -176,7 +176,7 @@ const line = (p) => {
 export const POST = handle(async (req) => {
   rateLimit(`concierge:${clientIp(req)}`, 12, 60_000);
   const settings = await getSettings();
-  if (!aiEnabled() || !settings.ai?.concierge) return fail("Concierge is offline", 503);
+  if (!(await aiEnabled()) || !settings.ai?.concierge) return fail("Concierge is offline", 503);
 
   let json;
   try {

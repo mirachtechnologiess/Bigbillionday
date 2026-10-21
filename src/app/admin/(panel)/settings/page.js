@@ -21,7 +21,7 @@ export default async function SettingsPage({ searchParams }) {
       tab={tab}
       isAdmin={user.role === "ADMIN"}
       razorpayReady={Boolean(process.env.RAZORPAY_KEY_ID && process.env.RAZORPAY_KEY_SECRET)}
-      aiConfigured={aiEnabled()}
+      aiConfigured={await aiEnabled()}
     />
   );
 }

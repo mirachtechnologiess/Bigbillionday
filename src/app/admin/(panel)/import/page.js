@@ -9,5 +9,5 @@ export const metadata = { title: "Bulk import" };
 export default async function ImportPage() {
   await requireAdminPage();
   const productCount = await db.product.count();
-  return <Importer aiOn={aiEnabled()} productCount={productCount} />;
+  return <Importer aiOn={await aiEnabled()} productCount={productCount} />;
 }

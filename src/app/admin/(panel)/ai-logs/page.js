@@ -42,7 +42,7 @@ export default async function AiLogsPage({ searchParams }) {
   const failRate = calls ? (weekFailed / calls) * 100 : 0;
   const failMap = Object.fromEntries(byTaskFailed.map((t) => [t.task, t._count]));
   const maxTask = Math.max(1, ...byTask.map((t) => t._count));
-  const on = aiEnabled();
+  const on = await aiEnabled();
 
   return (
     <div className="space-y-4">
@@ -53,7 +53,7 @@ export default async function AiLogsPage({ searchParams }) {
           <dl className="space-y-3 text-[12.5px]">
             <div className="flex items-center justify-between gap-3">
               <dt className="text-mute">AI configured</dt>
-              <dd>{on ? <Pill tone="lume">Yes</Pill> : <Pill tone="danger">No: set NVIDIA_API_KEY</Pill>}</dd>
+              <dd>{on ? <Pill tone="lume">Yes</Pill> : <Pill tone="danger">No: add key in Settings → AI</Pill>}</dd>
             </div>
             <div className="flex items-center justify-between gap-3">
               <dt className="text-mute">Text model</dt>

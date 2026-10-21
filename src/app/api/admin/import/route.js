@@ -29,7 +29,7 @@ const schema = z.object({
 /** POST {rows:[{index,data}], options} → { results: [{index, ok, id, action, error, warnings}] } */
 export const POST = adminRoute(async (req) => {
   const { rows, options } = await readJson(req, schema);
-  if (options.enrich && !canEnrich()) throw new HttpError(503, "AI is not configured — turn off AI enrichment or set NVIDIA_API_KEY");
+  if (options.enrich && !(await canEnrich())) throw new HttpError(503, "AI is not configured — turn off AI enrichment or set NVIDIA_API_KEY");
   const ctx = { categories: new Map() };
   const results = [];
   for (const r of rows) {

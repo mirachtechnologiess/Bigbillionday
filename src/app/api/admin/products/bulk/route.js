@@ -78,7 +78,7 @@ export const POST = adminRoute(async (req, { user }) => {
   }
 
   if (action === "seo") {
-    if (!aiEnabled()) throw new HttpError(503, "AI is not configured — set NVIDIA_API_KEY");
+    if (!(await aiEnabled())) throw new HttpError(503, "AI is not configured — add the NVIDIA API key in Settings → AI");
     if (ids.length > 10) throw new HttpError(422, "Send at most 10 products per AI SEO request");
     rateLimit(`ai:${user.id}`, 30, 60_000);
     const products = await db.product.findMany({ where, include: { brand: { select: { name: true } } } });

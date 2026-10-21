@@ -24,5 +24,5 @@ export default async function DashboardPage() {
     top: stats.top.map(({ images: _i, ...p }) => p),
   };
   const date = new Date().toLocaleDateString("en-IN", { weekday: "long", day: "numeric", month: "long", year: "numeric", timeZone: "Asia/Kolkata" });
-  return <DashboardView stats={data} hello={`${greeting()}, ${String(user.name || "there").split(" ")[0]}`} date={date} aiOn={aiEnabled()} />;
+  return <DashboardView stats={data} hello={`${greeting()}, ${String(user.name || "there").split(" ")[0]}`} date={date} aiOn={await aiEnabled()} />;
 }

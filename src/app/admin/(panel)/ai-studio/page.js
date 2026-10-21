@@ -29,7 +29,7 @@ export default async function AiStudioPage({ searchParams }) {
   return (
     <AiStudio
       initialTab={tab}
-      aiOn={aiEnabled()}
+      aiOn={await aiEnabled()}
       home={settings.home}
       autoModeration={Boolean(settings.ai?.autoReviewModeration)}
       reviews={{
