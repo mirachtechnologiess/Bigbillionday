@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { ArrowRight, Eye, EyeOff, Lock } from "lucide-react";
 import { toast } from "sonner";
@@ -9,7 +8,6 @@ import { api } from "./fetcher";
 import { Spinner } from "./ui";
 
 export default function AdminLoginForm({ next = "/admin" }) {
-  const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [show, setShow] = useState(false);
@@ -21,12 +19,19 @@ export default function AdminLoginForm({ next = "/admin" }) {
     setBusy(true);
     setError("");
     try {
-      await api("/api/auth-admin/login", { method: "POST", body: { email, password } });
+      await api("/api/auth-admin/login", { method: "POST", body: { email: email.trim(), password } });
       toast.success("Welcome back");
-      router.replace(next);
-      router.refresh();
+      // Full page load (not a client-side router transition): the new session cookie is guaranteed to be
+      // sent, and there is no race with redirects on slow connections or older browsers.
+      let target = next || "/admin";
+      if (window.location.hostname.startsWith("admin.") && (target === "/admin" || target.startsWith("/admin/"))) {
+        target = target.slice(6) || "/"; // admin.bigbillionday.store serves /admin/* at clean paths
+      }
+      window.location.assign(target);
     } catch (err) {
-      setError(err.message);
+      const msg = err.message || "Sign-in failed. Please try again.";
+      setError(msg);
+      toast.error(msg);
       setBusy(false);
     }
   };

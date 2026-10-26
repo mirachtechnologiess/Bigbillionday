@@ -133,7 +133,7 @@ export default function AdminShell({ user, badges, storeName, aiOn, children }) 
       await fetch("/api/auth-admin/logout", { method: "POST" });
     } catch {}
     toast.success("Signed out");
-    router.replace("/admin/login");
+    window.location.assign(window.location.hostname.startsWith("admin.") ? "/login" : "/admin/login");
     router.refresh();
   };
 
