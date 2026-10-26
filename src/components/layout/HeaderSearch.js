@@ -100,13 +100,14 @@ export default function HeaderSearch({ className, inputRef: externalRef }) {
 
   return (
     <div ref={boxRef} className={cn("relative", className)}>
-      <form onSubmit={submit} role="search" className="flex h-11 overflow-hidden rounded-lg border-2 border-gold bg-white shadow-sm">
+      <form method="get" action="/watches" onSubmit={submit} role="search" className="flex h-11 overflow-hidden rounded-lg border-2 border-gold bg-white shadow-sm">
         <label htmlFor={`${uid}-q`} className="sr-only">
           Search watches
         </label>
         <input
           ref={inputRef}
           id={`${uid}-q`}
+          name="q"
           value={q}
           onChange={(e) => {
             setQ(e.target.value);

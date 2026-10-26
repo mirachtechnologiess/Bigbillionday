@@ -24,7 +24,12 @@ export default async function LoginPage({ searchParams }) {
       }
       author="Leo Tolstoy"
     >
-      <LoginForm next={next} />
+      <LoginForm
+        next={next}
+        initialError={
+          { invalid: "That email/mobile and password don't match", blocked: "This account is disabled. Please contact support.", ratelimit: "Too many attempts — please wait a minute and try again" }[sp?.error] || ""
+        }
+      />
     </AuthShell>
   );
 }

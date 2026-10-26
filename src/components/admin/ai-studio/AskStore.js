@@ -119,7 +119,7 @@ export default function AskStore({ aiOn }) {
         ))}
       </div>
 
-      <form
+      <form method="post"
         className="flex gap-2"
         onSubmit={(e) => {
           e.preventDefault();

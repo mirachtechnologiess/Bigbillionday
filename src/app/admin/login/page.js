@@ -10,5 +10,11 @@ export default async function AdminLoginPage({ searchParams }) {
   const next = typeof sp?.next === "string" && sp.next.startsWith("/admin") && !sp.next.startsWith("//") ? sp.next : "/admin";
   const user = await getCurrentUser().catch(() => null);
   if (user && isAdminRole(user.role)) redirect(next);
-  return <AdminLoginForm next={next} />;
+  const ERRORS = {
+    invalid: "Invalid email or password",
+    noaccess: "This account does not have admin access",
+    blocked: "This account is blocked",
+    ratelimit: "Too many attempts — please wait a minute and try again",
+  };
+  return <AdminLoginForm next={next} initialError={ERRORS[sp?.error] || ""} />;
 }

@@ -105,7 +105,7 @@ export default function NvidiaKeyCard({ isAdmin }) {
       )}
 
       {isAdmin ? (
-        <form onSubmit={save} className="mt-3 flex flex-col gap-2 sm:flex-row">
+        <form method="post" onSubmit={save} className="mt-3 flex flex-col gap-2 sm:flex-row">
           <div className="relative flex-1">
             <input
               type={show ? "text" : "password"}

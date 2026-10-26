@@ -469,7 +469,7 @@ function BannerEditor({ banner, defaultPlacement, open, isDesktop, canDelete, on
 
   return (
     <SplitEditor open={open} isDesktop={isDesktop} onClose={onClose} title={banner ? "Edit banner" : "New banner"} subtitle={PLACEMENTS[f.placement]?.hint} footer={footer} emptyText="Select a banner">
-      <form
+      <form method="post"
         className="grid gap-4"
         onSubmit={(e) => {
           e.preventDefault();

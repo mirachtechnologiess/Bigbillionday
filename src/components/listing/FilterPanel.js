@@ -121,7 +121,7 @@ function PriceGroup({ params, setMany, range }) {
           );
         })}
       </div>
-      <form onSubmit={apply} className="mt-3 flex items-center gap-2">
+      <form method="post" onSubmit={apply} className="mt-3 flex items-center gap-2">
         <label className="sr-only" htmlFor="price-min">
           Minimum price
         </label>

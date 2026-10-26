@@ -278,7 +278,7 @@ export default function OrderDetail({ order: o, allowed, storeName }) {
 
           {/* Timeline */}
           <Card title="Timeline" icon={ClipboardList}>
-            <form onSubmit={addNote} className="mb-4 flex gap-2">
+            <form method="post" onSubmit={addNote} className="mb-4 flex gap-2">
               <input className="a-input" value={internal} onChange={(e) => setInternal(e.target.value)} placeholder="Add an internal note (visible to staff only)…" maxLength={1000} />
               <button className="a-btn" disabled={noteBusy || !internal.trim()}>
                 {noteBusy ? <Spinner /> : <MessageSquarePlus />} <span className="hidden sm:inline">Add note</span>

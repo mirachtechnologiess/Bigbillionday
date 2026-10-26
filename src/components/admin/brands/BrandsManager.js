@@ -244,7 +244,7 @@ function BrandEditor({ brand, open, isDesktop, canDelete, aiOn, onClose, onSaved
 
   return (
     <SplitEditor open={open} isDesktop={isDesktop} onClose={onClose} title={brand ? brand.name : "New brand"} subtitle={brand ? `${brand.productCount} products · /brands/${brand.slug}` : "Add a watch brand"} footer={footer} emptyText="Select a brand">
-      <form
+      <form method="post"
         className="grid gap-4"
         onSubmit={(e) => {
           e.preventDefault();

@@ -37,7 +37,7 @@ export default function ProfileForms({ user }) {
 
 function Panel({ n, title, children, onSubmit, busy, error, cta }) {
   return (
-    <form onSubmit={onSubmit} noValidate className="rounded-xl border border-line bg-white p-4 sm:p-5">
+    <form method="post" onSubmit={onSubmit} noValidate className="rounded-xl border border-line bg-white p-4 sm:p-5">
       <h2 className="mb-4 border-b border-line pb-3" data-step={n}>
         <span className="text-[16px] font-bold text-bone">{title}</span>
       </h2>

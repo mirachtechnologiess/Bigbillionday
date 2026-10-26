@@ -1,7 +1,6 @@
 "use client";
 import { useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { ArrowRight, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { loginSchema, fieldErrors, issuesToErrors, safeNext } from "@/lib/validators";
@@ -10,11 +9,10 @@ import Field from "@/components/commerce/Field";
 import PasswordInput from "./PasswordInput";
 import { syncWishlist } from "./syncWishlist";
 
-export default function LoginForm({ next }) {
-  const router = useRouter();
+export default function LoginForm({ next, initialError = "" }) {
   const [form, setForm] = useState({ identifier: "", password: "" });
   const [errors, setErrors] = useState({});
-  const [error, setError] = useState("");
+  const [error, setError] = useState(initialError);
   const [busy, setBusy] = useState(false);
   const dest = safeNext(next);
 
@@ -47,8 +45,7 @@ export default function LoginForm({ next }) {
       }
       await syncWishlist();
       toast.success(`Welcome back, ${data.user.name.split(" ")[0]}`);
-      router.replace(dest);
-      router.refresh();
+      window.location.assign(dest || "/account");
     } catch (err) {
       setError(err.message);
       setBusy(false);
@@ -56,9 +53,11 @@ export default function LoginForm({ next }) {
   }
 
   return (
-    <form onSubmit={onSubmit} noValidate className="space-y-5">
+    <form method="post" action="/api/auth/login" onSubmit={onSubmit} noValidate className="space-y-5">
+      <input type="hidden" name="next" value={dest || ""} />
       <Field
         id="login-identifier"
+        name="identifier"
         label="Email or mobile number"
         autoComplete="username"
         value={form.identifier}
@@ -67,6 +66,7 @@ export default function LoginForm({ next }) {
       />
       <PasswordInput
         id="login-password"
+        name="password"
         label="Password"
         autoComplete="current-password"
         value={form.password}

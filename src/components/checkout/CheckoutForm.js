@@ -216,7 +216,7 @@ export default function CheckoutForm({ user, addresses, settings }) {
   const placeLabel = method === "COD" ? `Place order · ${formatINR(totals.total)}` : `Pay ${formatINR(totals.total)}`;
 
   return (
-    <form onSubmit={onSubmit} noValidate>
+    <form method="post" onSubmit={onSubmit} noValidate>
       <header className="flex flex-wrap items-center justify-between gap-3">
         <h1 className="flex items-center gap-2 text-2xl font-bold text-bone sm:text-3xl">
           <Lock className="size-5 text-lume" strokeWidth={2} aria-hidden />
@@ -365,8 +365,11 @@ export default function CheckoutForm({ user, addresses, settings }) {
           </div>
 
           <div className="pb-[env(safe-area-inset-bottom)]">
-            <button type="submit" className="btn btn-gold h-[52px] w-full text-[15px]" disabled={submitting || codBlocked}>
-              {submitting ? (
+            {/* Disabled until the page is interactive, so an early tap can't do a plain form post and lose the details */}
+            <button type="submit" className="btn btn-gold h-[52px] w-full text-[15px]" disabled={!mounted || submitting || codBlocked}>
+              {!mounted ? (
+                "Loading…"
+              ) : submitting ? (
                 <>
                   <span className="size-4 animate-spin rounded-full border-2 border-white/40 border-t-white" aria-hidden />
                   Placing your order…

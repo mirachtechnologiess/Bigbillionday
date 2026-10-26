@@ -247,7 +247,7 @@ function CategoryEditor({ category, defaultParent, items, open, isDesktop, canDe
       footer={footer}
       emptyText="Select a category"
     >
-      <form
+      <form method="post"
         className="grid gap-4"
         onSubmit={(e) => {
           e.preventDefault();

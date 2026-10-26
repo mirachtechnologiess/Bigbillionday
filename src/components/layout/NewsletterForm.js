@@ -30,7 +30,7 @@ export default function NewsletterForm() {
   };
 
   return (
-    <form onSubmit={submit} className="w-full max-w-md">
+    <form method="post" onSubmit={submit} className="w-full max-w-md">
       <label htmlFor="nl-email" className="sr-only">
         Email address
       </label>

@@ -105,7 +105,7 @@ export default function AddressBook({ initial, defaults }) {
 
       <AnimatePresence initial={false} mode="wait">
         {editing !== null ? (
-          <motion.form
+          <motion.form method="post"
             key="form"
             onSubmit={save}
             noValidate

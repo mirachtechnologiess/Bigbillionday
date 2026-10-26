@@ -87,7 +87,7 @@ export default function CouponField({ subtotal, className }) {
       </button>
       <AnimatePresence initial={false}>
         {open && (
-          <motion.form
+          <motion.form method="post"
             id={`${id}-panel`}
             onSubmit={apply}
             initial={{ height: 0, opacity: 0 }}

@@ -23,7 +23,13 @@ export async function api(url, { method = "GET", body, signal, headers } = {}) {
     data = { error: text?.slice(0, 200) };
   }
   if (!res.ok) {
-    if (res.status === 401 && typeof window !== "undefined") window.location.href = `/admin/login?next=${encodeURIComponent(location.pathname)}`;
+    // Session expired → back to the login page, keeping the current page as "next".
+    // Never for the login endpoint itself: there a 401 just means "wrong password" and must be shown.
+    if (res.status === 401 && typeof window !== "undefined" && !url.startsWith("/api/auth-admin/")) {
+      const onAdminHost = location.hostname.startsWith("admin.");
+      const here = onAdminHost && !location.pathname.startsWith("/admin") ? `/admin${location.pathname === "/" ? "" : location.pathname}` : location.pathname;
+      window.location.href = `${onAdminHost ? "/login" : "/admin/login"}?next=${encodeURIComponent(here)}`;
+    }
     const err = new Error(data?.error || `Request failed (${res.status})`);
     err.status = res.status;
     err.data = data;

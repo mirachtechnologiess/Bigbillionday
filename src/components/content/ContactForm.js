@@ -138,7 +138,7 @@ export default function ContactForm() {
             </button>
           </motion.div>
         ) : (
-          <motion.form
+          <motion.form method="post"
             key="form"
             ref={formRef}
             noValidate

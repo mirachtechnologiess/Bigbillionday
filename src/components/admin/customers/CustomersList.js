@@ -226,7 +226,7 @@ function CreateStaffModal({ open, onClose, onCreated }) {
         </>
       }
     >
-      <form onSubmit={submit} className="grid gap-3 sm:grid-cols-2">
+      <form method="post" onSubmit={submit} className="grid gap-3 sm:grid-cols-2">
         <Field label="Name" className="sm:col-span-2"><input className="a-input" value={f.name} onChange={up("name")} required autoFocus /></Field>
         <Field label="Email"><input className="a-input" type="email" value={f.email} onChange={up("email")} required /></Field>
         <Field label="Phone (optional)"><input className="a-input a-num" inputMode="numeric" value={f.phone} onChange={up("phone")} /></Field>

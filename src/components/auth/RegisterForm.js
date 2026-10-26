@@ -67,7 +67,7 @@ export default function RegisterForm({ next }) {
   }
 
   return (
-    <form onSubmit={onSubmit} noValidate className="space-y-5">
+    <form method="post" onSubmit={onSubmit} noValidate className="space-y-5">
       <Field id="reg-name" label="Full name" autoComplete="name" value={form.name} onChange={set("name")} error={errors.name} />
       <Field
         id="reg-email"

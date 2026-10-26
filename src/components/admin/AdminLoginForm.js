@@ -7,12 +7,12 @@ import { toast } from "sonner";
 import { api } from "./fetcher";
 import { Spinner } from "./ui";
 
-export default function AdminLoginForm({ next = "/admin" }) {
+export default function AdminLoginForm({ next = "/admin", initialError = "" }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [show, setShow] = useState(false);
   const [busy, setBusy] = useState(false);
-  const [error, setError] = useState("");
+  const [error, setError] = useState(initialError);
 
   const submit = async (e) => {
     e.preventDefault();
@@ -48,12 +48,15 @@ export default function AdminLoginForm({ next = "/admin" }) {
         })}
       </svg>
       <motion.form
+        method="post"
+        action="/api/auth-admin/login"
         onSubmit={submit}
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
         className="a-card relative w-full max-w-[400px] p-7 shadow-[0_30px_80px_-30px_rgba(17,24,39,.3)]"
       >
+        <input type="hidden" name="next" value={next} />
         <div className="mb-6 flex items-center gap-3">
           <span className="grid h-10 w-10 place-items-center rounded-full border border-gold/40 bg-gold/10">
             <Lock className="h-4 w-4 text-gold" />
@@ -65,12 +68,12 @@ export default function AdminLoginForm({ next = "/admin" }) {
         </div>
         <label className="mb-3 block">
           <span className="a-label">Email</span>
-          <input className="a-input !h-11" type="email" autoComplete="username" required value={email} onChange={(e) => setEmail(e.target.value)} autoFocus />
+          <input className="a-input !h-11" type="email" name="email" autoComplete="username" required value={email} onChange={(e) => setEmail(e.target.value)} autoFocus />
         </label>
         <label className="mb-2 block">
           <span className="a-label">Password</span>
           <span className="relative block">
-            <input className="a-input !h-11 !pr-10" type={show ? "text" : "password"} autoComplete="current-password" required value={password} onChange={(e) => setPassword(e.target.value)} />
+            <input className="a-input !h-11 !pr-10" type={show ? "text" : "password"} name="password" autoComplete="current-password" required value={password} onChange={(e) => setPassword(e.target.value)} />
             <button type="button" onClick={() => setShow((s) => !s)} className="absolute right-3 top-1/2 -translate-y-1/2 text-mute hover:text-bone" aria-label={show ? "Hide password" : "Show password"}>
               {show ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
             </button>

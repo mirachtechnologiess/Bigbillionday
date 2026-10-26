@@ -43,7 +43,7 @@ export default function PincodeChecker() {
 
   return (
     <div>
-      <form
+      <form method="post"
         onSubmit={(e) => {
           e.preventDefault();
           check();

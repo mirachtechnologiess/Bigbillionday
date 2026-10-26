@@ -457,7 +457,7 @@ export default function ConciergePanel({ open, onClose, storeName = "Our boutiqu
             </div>
 
             {/* Composer */}
-            <form
+            <form method="post"
               onSubmit={(e) => {
                 e.preventDefault();
                 send();

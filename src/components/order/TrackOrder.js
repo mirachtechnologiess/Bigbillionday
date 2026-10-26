@@ -53,7 +53,7 @@ export default function TrackOrder({ initialOrderNumber = "" }) {
 
   return (
     <div className="grid gap-5 lg:grid-cols-[400px_minmax(0,1fr)] lg:gap-6">
-      <form
+      <form method="post"
         onSubmit={onSubmit}
         noValidate
         className="h-fit space-y-4 rounded-xl border border-line bg-white p-4 sm:p-5 lg:sticky lg:top-[calc(var(--header-h)+1rem)]"

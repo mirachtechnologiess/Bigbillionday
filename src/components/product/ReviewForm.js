@@ -64,7 +64,7 @@ export default function ReviewForm({ productId }) {
       ) : null}
       <AnimatePresence>
         {open && (
-          <motion.form
+          <motion.form method="post"
             onSubmit={submit}
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: "auto" }}
