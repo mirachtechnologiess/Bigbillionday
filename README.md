@@ -1,4 +1,4 @@
-# BigBillionDay — bigbillionday.store
+# PremiumShopy — premiumshopy.com
 
 A premium watch store built with Next.js 15 (App Router, JavaScript), PostgreSQL + Prisma, a 3D/scroll-animated storefront, and an AI-assisted admin panel powered by NVIDIA NIM.
 

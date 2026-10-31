@@ -21,7 +21,7 @@ function cssVarFont(name, fallback) {
  * Paints a sunburst dial onto a canvas: radial brushed rays, vignette, minute track,
  * lume plots, date window and the maker's signature. Returns a THREE.CanvasTexture.
  */
-export function createDialTexture({ size = 1024, dialColor = "#0d3236", accent = "#e6cf9f", brand = "BIGBILLIONDAY" } = {}) {
+export function createDialTexture({ size = 1024, dialColor = "#0d3236", accent = "#e6cf9f", brand = "PREMIUMSHOPY" } = {}) {
   const cv = document.createElement("canvas");
   cv.width = cv.height = size;
   const ctx = cv.getContext("2d");
@@ -111,7 +111,7 @@ export function createDialTexture({ size = 1024, dialColor = "#0d3236", accent =
   const mono = cssVarFont("--font-mono-face", "ui-monospace, monospace");
   ctx.fillStyle = accent;
   ctx.font = `italic ${Math.round(size * 0.07)}px ${serif}`;
-  ctx.fillText("BBD", 0, -R * 0.42);
+  ctx.fillText("PS", 0, -R * 0.42);
   ctx.font = `500 ${Math.round(size * 0.026)}px ${mono}`;
   ctx.fillStyle = "rgba(255,255,255,0.82)";
   const spaced = brand.toUpperCase().split("").join(String.fromCharCode(8202));

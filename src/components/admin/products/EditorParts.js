@@ -88,7 +88,7 @@ export function SpecsEditor({ value = [], onChange }) {
 }
 
 /** Google search result preview. */
-export function SerpPreview({ title, slug, desc, storeName = "BigBillionDay" }) {
+export function SerpPreview({ title, slug, desc, storeName = "PremiumShopy" }) {
   const t = title || "Product title";
   return (
     <div className="rounded-xl bg-white p-3.5 font-[arial,sans-serif] text-left">
@@ -96,7 +96,7 @@ export function SerpPreview({ title, slug, desc, storeName = "BigBillionDay" }) 
         <span className="grid h-6 w-6 place-items-center rounded-full bg-[#f1f3f4] text-[11px] font-bold text-[#202124]">{storeName[0]}</span>
         <div className="min-w-0 leading-tight">
           <div className="truncate text-[12.5px] text-[#202124]">{storeName}</div>
-          <div className="truncate text-[11.5px] text-[#4d5156]">https://bigbillionday.store › watches › {slug || "…"}</div>
+          <div className="truncate text-[11.5px] text-[#4d5156]">https://premiumshopy.com › watches › {slug || "…"}</div>
         </div>
       </div>
       <div className="mt-1.5 line-clamp-1 text-[17px] leading-snug text-[#1a0dab]">{t.length > 60 ? t.slice(0, 58) + " …" : t}</div>

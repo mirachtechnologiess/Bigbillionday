@@ -105,7 +105,7 @@ function StrapLink({ i, n, dir, geo, mat, len, bend }) {
  * Procedural luxury watch. Exposes its layer groups via ref:
  * { root, crystal, bezel, hands, dial, case, movement, strap } so a rig can explode it.
  */
-const WatchModel = forwardRef(function WatchModel({ colorway, low = false, brand = "BIGBILLIONDAY", state }, ref) {
+const WatchModel = forwardRef(function WatchModel({ colorway, low = false, brand = "PREMIUMSHOPY", state }, ref) {
   const root = useRef();
   const crystal = useRef();
   const bezel = useRef();

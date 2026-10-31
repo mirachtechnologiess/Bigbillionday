@@ -41,7 +41,7 @@ const COLUMNS = [
 export default function Footer({ settings }) {
   const store = settings?.store || {};
   const free = settings?.shipping?.freeShippingAbove;
-  const name = store.name || "BigBillionDay";
+  const name = store.name || "PremiumShopy";
   const year = new Date().getFullYear();
   const socials = [
     ["Instagram", store.instagram],

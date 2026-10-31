@@ -55,7 +55,7 @@ function brandOf(raw = "", title = "") {
   const b = raw.trim();
   for (const [re, name] of BRAND_MAP) if (re.test(b)) return name;
   for (const [re, name] of BRAND_MAP) if (re.test(title.trim())) return name;
-  if (!b || b.length <= 3 || /^(gen2|wondercrate|cr7|shiva|rosemary)$/i.test(b)) return "BigBillionDay Select";
+  if (!b || b.length <= 3 || /^(gen2|wondercrate|cr7|shiva|rosemary)$/i.test(b)) return "PremiumShopy Select";
   return b.replace(/\s+/g, " ").replace(/\b\w/g, (m) => m.toUpperCase());
 }
 const NON_WATCH = /(sunglass|shade|ray-?ban|chrome heart|buds|earbud|airpod|spray|idol|hair|perfume)/i;

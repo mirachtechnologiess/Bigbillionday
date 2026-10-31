@@ -2,9 +2,9 @@ import { NextResponse } from "next/server";
 import { SESSION_COOKIE, readToken } from "@/lib/session-token";
 
 /**
- * Hosts (production): storefront on bigbillionday.store, admin panel on admin.bigbillionday.store.
+ * Hosts (production): storefront on premiumshopy.com, admin panel on admin.premiumshopy.com.
  * Admin pages live under /admin/* in the app; on the admin host they are served at clean paths
- * (admin.bigbillionday.store/orders → /admin/orders) via an internal rewrite.
+ * (admin.premiumshopy.com/orders → /admin/orders) via an internal rewrite.
  * NEXT_PUBLIC_ADMIN_HOST is baked in at build time; when it's unset (local dev) /admin works as before.
  */
 const ADMIN_HOST = (process.env.NEXT_PUBLIC_ADMIN_HOST || "").toLowerCase();
@@ -50,7 +50,7 @@ export async function middleware(req) {
       return res;
     }
   } else if (ADMIN_HOST && (host === SITE_HOST || host === `www.${SITE_HOST}`) && isAdminPath(pathname)) {
-    // bigbillionday.store/admin/... → admin.bigbillionday.store/...
+    // premiumshopy.com/admin/... → admin.premiumshopy.com/...
     return NextResponse.redirect(absolute(req, ADMIN_HOST, (pathname.slice(6) || "/") + search), 308);
   }
 

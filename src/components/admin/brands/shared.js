@@ -91,7 +91,7 @@ export function SeoPreview({ title, desc, path }) {
   return (
     <div className="rounded-xl border border-line bg-ink p-3">
       <div className="a-label !mb-1.5 !text-[9.5px]">Search preview</div>
-      <div className="truncate text-[11.5px] text-mute">bigbillionday.store{path}</div>
+      <div className="truncate text-[11.5px] text-mute">premiumshopy.com{path}</div>
       <div className={cn("truncate text-[15px] leading-snug text-[#1a0dab]", !title && "italic opacity-60")}>{title || "SEO title"}</div>
       <div className={cn("line-clamp-2 text-[12px] text-bone-2", !desc && "italic opacity-60")}>{desc || "Meta description shown under the title in Google results."}</div>
     </div>

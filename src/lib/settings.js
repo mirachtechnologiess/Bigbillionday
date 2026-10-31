@@ -6,9 +6,9 @@ import { db } from "./db";
 /** Defaults for every store setting. Admin > Settings overrides these (stored in the Setting table). */
 export const DEFAULT_SETTINGS = {
   store: {
-    name: "BigBillionDay",
+    name: "PremiumShopy",
     tagline: "Time, curated.",
-    email: "support@bigbillionday.store",
+    email: "support@premiumshopy.com",
     phone: "",
     whatsapp: "",
     address: "",
@@ -30,7 +30,7 @@ export const DEFAULT_SETTINGS = {
     razorpayEnabled: false, // "coming soon" until switched on
   },
   seo: {
-    title: "BigBillionDay — Watches for Men & Women at Best Prices | Cash on Delivery",
+    title: "PremiumShopy — Watches for Men & Women at Best Prices | Cash on Delivery",
     description:
       "Shop stylish watches for men & women — analog, digital and smart watches at unbeatable prices. Cash on Delivery across India, easy returns.",
     keywords: "watches, luxury watches, men watches, women watches, automatic watch, chronograph, buy watches online india, cod watches",

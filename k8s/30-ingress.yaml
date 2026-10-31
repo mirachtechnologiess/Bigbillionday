@@ -1,5 +1,5 @@
 # Requires ingress-nginx + cert-manager (ClusterIssuer "letsencrypt-prod").
-# Point DNS A records for bigbillionday.store and www.bigbillionday.store at the ingress load balancer IP.
+# Point DNS A records for premiumshopy.com and www.premiumshopy.com at the ingress load balancer IP.
 apiVersion: cert-manager.io/v1
 kind: ClusterIssuer
 metadata:
@@ -7,7 +7,7 @@ metadata:
 spec:
   acme:
     server: https://acme-v02.api.letsencrypt.org/directory
-    email: admin@bigbillionday.store
+    email: admin@premiumshopy.com
     privateKeySecretRef: { name: letsencrypt-prod }
     solvers: [{ http01: { ingress: { ingressClassName: nginx } } }]
 ---
@@ -25,10 +25,10 @@ metadata:
 spec:
   ingressClassName: nginx
   tls:
-    - hosts: [bigbillionday.store, www.bigbillionday.store]
-      secretName: bigbillionday-tls
+    - hosts: [premiumshopy.com, www.premiumshopy.com]
+      secretName: premiumshopy-tls
   rules:
-    - host: bigbillionday.store
+    - host: premiumshopy.com
       http:
         paths:
           - path: /

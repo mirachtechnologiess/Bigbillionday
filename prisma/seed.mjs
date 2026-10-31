@@ -123,7 +123,7 @@ async function renderImages(p, i) {
 }
 
 async function main() {
-  const email = process.env.ADMIN_EMAIL || "admin@bigbillionday.store";
+  const email = process.env.ADMIN_EMAIL || "admin@premiumshopy.com";
   const password = process.env.ADMIN_PASSWORD || "ChangeMe@123";
   await db.user.upsert({
     where: { email },

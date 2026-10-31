@@ -17,7 +17,7 @@ export function requestOrigin(req) {
 
 export const redirect303 = (req, path) => NextResponse.redirect(`${requestOrigin(req)}${path}`, 303);
 
-/** True when this request came in on the admin subdomain (admin.bigbillionday.store). */
+/** True when this request came in on the admin subdomain (admin.premiumshopy.com). */
 export function onAdminHost(req) {
   const admin = (process.env.NEXT_PUBLIC_ADMIN_HOST || "").toLowerCase();
   const host = (req.headers.get("x-forwarded-host") || req.headers.get("host") || "").split(":")[0].toLowerCase();

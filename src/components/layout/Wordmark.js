@@ -6,13 +6,13 @@ import { cn } from "@/lib/utils";
  * Height follows the font-size set through className (e.g. text-[26px] → ~42px tall logo).
  * `light` uses the white-text variant for dark backgrounds.
  */
-export default function Wordmark({ name = "BigBillionDay", className, light = false, priority = false }) {
+export default function Wordmark({ name = "PremiumShopy", className, light = false, priority = false }) {
   return (
     <span className={cn("inline-flex items-center leading-none", className)}>
       <Image
         src={light ? "/logo-light.png" : "/logo.png"}
         alt={name}
-        width={721}
+        width={1028}
         height={240}
         priority={priority}
         sizes="200px"

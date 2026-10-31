@@ -116,7 +116,7 @@ function CategoryRow() {
 }
 
 export default function Header({ settings }) {
-  const storeName = settings?.store?.name || "BigBillionDay";
+  const storeName = settings?.store?.name || "PremiumShopy";
   const pathname = usePathname();
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);

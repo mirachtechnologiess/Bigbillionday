@@ -178,7 +178,7 @@ const ATTR_HELP = Object.entries(WATCH_ATTRS)
   .map(([k, v]) => `- ${k}: one of ${JSON.stringify(v)} or null`)
   .join("\n");
 
-const COPY_SYSTEM = `You are the senior copywriter for "BigBillionDay", an Indian online watch store (bigbillionday.store, Cash on Delivery across India).
+const COPY_SYSTEM = `You are the senior copywriter for "PremiumShopy", an Indian online watch store (premiumshopy.com, Cash on Delivery across India).
 Voice: confident, warm, aspirational but honest; written for Indian buyers (gifting for weddings/festivals/office wear, value for money, COD convenience); Indian English; prices in ₹ only when asked.
 Hard rules:
 - NEVER describe any product as "original", "genuine", "100% genuine", "authentic", "authorised"/"authorized", "official", "certified", "licensed" or "brand new from the brand", and NEVER mention an authenticity certificate, brand/manufacturer/official warranty, warranty card or authorised dealer/retailer, even if the input or admin notes mention them. Brand names may be used only to describe style/design.
@@ -505,7 +505,7 @@ export async function aiAsk(question, snapshot) {
 
 /* ════════════════════ Banner copy ════════════════════ */
 
-const BANNER_SYSTEM = `You write homepage sale-banner copy for "BigBillionDay", an Indian online watch store (Cash on Delivery across India).
+const BANNER_SYSTEM = `You write homepage sale-banner copy for "PremiumShopy", an Indian online watch store (Cash on Delivery across India).
 Tone: short, punchy, high-energy Indian e-commerce (think festive sale banners) — clear value, urgency without lying.
 Hard rules:
 - NEVER use the words original, genuine, authentic, authorised/authorized, official, certified or licensed, and NEVER mention brand/manufacturer/official warranty, authenticity certificates or authorised dealers.

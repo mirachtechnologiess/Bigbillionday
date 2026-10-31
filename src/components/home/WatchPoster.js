@@ -106,7 +106,7 @@ export default function WatchPoster({ colorway = "steel", className = "", style 
         })}
       <rect x="259" y="194" width="14" height="12" fill="#f4efe4" stroke={c.dialAccent} strokeWidth="0.8" />
       <text x="200" y="164" textAnchor="middle" fill={c.dialAccent} fontSize="14" fontStyle="italic" style={{ fontFamily: "var(--font-display)" }}>
-        BBD
+        PS
       </text>
       <text x="200" y="232" textAnchor="middle" fill={c.dialAccent} fontSize="5.5" letterSpacing="1.6" style={{ fontFamily: "var(--font-mono)" }}>
         AUTOMATIC

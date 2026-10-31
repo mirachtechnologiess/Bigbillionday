@@ -199,7 +199,7 @@ export default function WatchScene({ progressRef, colorway = "steel", active = t
         pointer={pointer}
         mobile={mobile}
         onReady={onReady}
-        intro={{ skip: skipIntro, low, brand: brand || "BIGBILLIONDAY", colorway }}
+        intro={{ skip: skipIntro, low, brand: brand || "PREMIUMSHOPY", colorway }}
       />
       {/* Stronger, slightly cool contact shadow grounds the steel on a white page (cheaper map on low-end). */}
       <ContactShadows position={[0, -2.15, 0]} opacity={0.72} scale={9} blur={2.4} far={4.5} resolution={low ? 128 : 256} color="#1f2430" />

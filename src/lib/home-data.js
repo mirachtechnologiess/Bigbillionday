@@ -126,7 +126,7 @@ export const getHomeMerch = cache(
     const priceBands = buildBands(prices.map((p) => p.price));
 
     // Featured brand for the ad carousel: the biggest real brand (skip the house label).
-    const topBrand = brandTiles.find((b) => b.slug !== "premium-shopy-select" && b.count >= 3) || null;
+    const topBrand = brandTiles.find((b) => !/^premium-?shopy-select$/.test(b.slug) && b.count >= 3) || null;
     const topBrandProducts = topBrand
       ? await db.product.findMany({
           where: { ...ACTIVE, brand: { slug: topBrand.slug }, images: { some: {} } },
@@ -244,7 +244,7 @@ export function buildBannerSlides(banners, merch) {
       badge: `UP TO ${merch.maxDiscount}% OFF`,
       title: "Luxury looks, everyday prices",
       sub: (() => {
-        const names = [...new Set(deals.slice(0, 8).map((d) => d.brand).filter((b) => b && !/bigbillionday|premium shopy/i.test(b)))].slice(0, 3);
+        const names = [...new Set(deals.slice(0, 8).map((d) => d.brand).filter((b) => b && !/premiumshopy|premium shopy/i.test(b)))].slice(0, 3);
         return names.length ? `${names.join(", ")} & more` : "Top styles at their lowest prices";
       })(),
       href: "/watches?sale=1&sort=price-asc",

@@ -62,7 +62,7 @@ function Ctas() {
  * disassembles the watch. Mobile / reduced motion: no pin — just the watch and the copy.
  * Starts directly below the (solid, sticky) header. Poster SVG paints first; WebGL mounts lazily on idle.
  */
-export default function Hero({ title, subtitle, storeName = "BigBillionDay" }) {
+export default function Hero({ title, subtitle, storeName = "PremiumShopy" }) {
   const root = useRef(null);
   const progress = useRef(0);
   const [colorway, setColorway] = useState("steel");
@@ -187,7 +187,7 @@ export default function Hero({ title, subtitle, storeName = "BigBillionDay" }) {
         <div className="pointer-events-none absolute inset-x-0 top-4 z-10 md:top-6">
           <div className="container-lux flex items-start justify-between gap-6 text-[11px] font-semibold uppercase tracking-[0.18em] text-mute">
             <p className={`${s.fadeIn} hidden font-mono sm:block`} style={{ animationDelay: "0.9s" }}>
-              Ref. BBD-41 <span className="mx-2 text-line-2">/</span> Automatic <span className="mx-2 text-line-2">/</span> 41 mm
+              Ref. PS-41 <span className="mx-2 text-line-2">/</span> Automatic <span className="mx-2 text-line-2">/</span> 41 mm
             </p>
             <p className={`${s.fadeIn} ml-auto rounded-full border border-line bg-white px-3 py-1.5 text-bone-2 shadow-sm`} style={{ animationDelay: "1s" }}>
               <LiveClock />

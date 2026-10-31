@@ -110,7 +110,7 @@ export default function Importer({ aiOn, productCount }) {
   };
 
   const downloadTemplate = () => {
-    downloadFile(Papa.unparse({ fields: IMPORT_KEYS, data: TEMPLATE_EXAMPLES.map((r) => IMPORT_KEYS.map((k) => r[k] ?? "")) }), "bigbillionday-products-template.csv");
+    downloadFile(Papa.unparse({ fields: IMPORT_KEYS, data: TEMPLATE_EXAMPLES.map((r) => IMPORT_KEYS.map((k) => r[k] ?? "")) }), "premiumshopy-products-template.csv");
   };
 
   const reset = () => {

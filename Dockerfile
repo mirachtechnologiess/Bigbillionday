@@ -20,7 +20,7 @@ RUN --mount=type=cache,target=/root/.npm npm ci
 FROM base AS builder
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
-ARG NEXT_PUBLIC_SITE_URL=https://bigbillionday.store
+ARG NEXT_PUBLIC_SITE_URL=https://premiumshopy.com
 # Admin panel on its own subdomain; storefront links from admin become absolute. Leave empty for single-host.
 ARG NEXT_PUBLIC_ADMIN_HOST=
 ARG NEXT_PUBLIC_STORE_ORIGIN=

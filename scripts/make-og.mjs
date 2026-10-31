@@ -1,5 +1,5 @@
 // Renders the default social share image (public/og-default.jpg, 1200×630):
-// white card with the BigBillionDay logo, tagline and three real product photos from the catalogue.
+// white card with the PremiumShopy logo, tagline and three real product photos from the catalogue.
 // Run after logo assets exist: node scripts/make-og.mjs
 import sharp from "sharp";
 import path from "node:path";
@@ -32,7 +32,7 @@ const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630">
   <text x="72" y="392" font-family="Arial, Helvetica, sans-serif" font-size="26" fill="#3f4550">at unbeatable prices</text>
   <rect x="72" y="438" width="356" height="52" rx="26" fill="#f2600c"/>
   <text x="250" y="472" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-weight="700" font-size="22" fill="#ffffff">Cash on Delivery · India</text>
-  <text x="72" y="556" font-family="Arial, Helvetica, sans-serif" font-weight="700" font-size="20" letter-spacing="2" fill="#0b7d78">BIGBILLIONDAY.STORE</text>
+  <text x="72" y="556" font-family="Arial, Helvetica, sans-serif" font-weight="700" font-size="20" letter-spacing="2" fill="#0b7d78">PREMIUMSHOPY.COM</text>
 </svg>`;
 
 const logo = await sharp("public/logo.png").resize({ width: 500 }).toBuffer();

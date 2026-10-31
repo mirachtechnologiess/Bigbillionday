@@ -517,7 +517,7 @@ export function timeAgo(d) {
 }
 
 /**
- * usePathname() normalised to the app's /admin/* routes. On admin.bigbillionday.store the browser
+ * usePathname() normalised to the app's /admin/* routes. On admin.premiumshopy.com the browser
  * shows clean paths (/orders) that the middleware rewrites to /admin/orders; nav highlighting and
  * URL-building code compare against /admin/*.
  */

@@ -19,12 +19,12 @@ export function slugify(str = "") {
 }
 
 export const siteUrl = (path = "") =>
-  `${(process.env.NEXT_PUBLIC_SITE_URL || "https://bigbillionday.store").replace(/\/$/, "")}${path}`;
+  `${(process.env.NEXT_PUBLIC_SITE_URL || "https://premiumshopy.com").replace(/\/$/, "")}${path}`;
 
 export function generateOrderNumber() {
   const d = new Date();
   const ymd = `${String(d.getFullYear()).slice(2)}${String(d.getMonth() + 1).padStart(2, "0")}${String(d.getDate()).padStart(2, "0")}`;
-  return `BBD${ymd}${Math.random().toString(36).slice(2, 7).toUpperCase()}`;
+  return `PS${ymd}${Math.random().toString(36).slice(2, 7).toUpperCase()}`;
 }
 
 export const ORDER_STATUS_LABEL = {

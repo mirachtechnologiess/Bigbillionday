@@ -9,7 +9,7 @@ metadata:
   name: web-config
   namespace: premiumshopy
 data:
-  NEXT_PUBLIC_SITE_URL: "https://bigbillionday.store"
+  NEXT_PUBLIC_SITE_URL: "https://premiumshopy.com"
   NVIDIA_BASE_URL: "https://integrate.api.nvidia.com/v1"
   NVIDIA_TEXT_MODEL: "nvidia/nemotron-3-super-120b-a12b"
   NVIDIA_VISION_MODEL: "nvidia/nemotron-3.5-super-vl-120b-a12b"
@@ -21,7 +21,7 @@ data:
 #     --from-literal=DATABASE_URL='postgresql://premiumshopy:<pw>@postgres:5432/premiumshopy?schema=public' \
 #     --from-literal=AUTH_SECRET='<48+ random chars>' \
 #     --from-literal=NVIDIA_API_KEY='<nvapi-...>' \
-#     --from-literal=ADMIN_EMAIL='admin@bigbillionday.store' \
+#     --from-literal=ADMIN_EMAIL='admin@premiumshopy.com' \
 #     --from-literal=ADMIN_PASSWORD='<strong password>' \
 #     --from-literal=RAZORPAY_KEY_ID='' --from-literal=RAZORPAY_KEY_SECRET=''
 #

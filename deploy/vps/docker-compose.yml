@@ -1,10 +1,11 @@
-# Production stack for a single small VPS (Namecheap "Spark": 1 vCPU · 1 GB RAM · 20 GB SSD).
-# Lives at /opt/bigbillionday on the server next to .env and Caddyfile; CI copies this file there
-# and runs:  docker compose pull && docker compose run --rm migrate && docker compose up -d
+# Production stack on the shared AceCloud server (2 vCPU · 8 GB RAM, Ubuntu 22.04, Noida).
+# Lives at /opt/premiumshopy next to .env; CI copies this file there and runs:
+#   docker compose pull && docker compose run --rm migrate && docker compose up -d
 #
-# Images are built by GitHub Actions (never on the server — `next build` needs >1 GB RAM).
-# Memory budget (≈1 GB RAM + 2 GB swap): web 640 MB · db 300 MB · caddy 96 MB.
-name: bigbillionday
+# The host's nginx (shared with other sites) terminates HTTPS and proxies premiumshopy.com,
+# www and admin to 127.0.0.1:3600 — see nginx-premiumshopy.conf. Nothing here listens publicly.
+# Images are built by GitHub Actions, never on the server.
+name: premiumshopy
 
 x-logging: &logging
   driver: json-file
@@ -15,84 +16,66 @@ services:
     image: postgres:16-alpine
     restart: unless-stopped
     environment:
-      POSTGRES_USER: bbd
+      POSTGRES_USER: premiumshopy
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env}
-      POSTGRES_DB: bigbillionday
-    # Tuned for ~300 MB: small shared buffers, few connections (Prisma pool is capped at 5).
+      POSTGRES_DB: premiumshopy
     command: >
       postgres
-      -c shared_buffers=96MB
-      -c effective_cache_size=256MB
+      -c shared_buffers=128MB
+      -c effective_cache_size=512MB
       -c work_mem=4MB
-      -c maintenance_work_mem=32MB
-      -c max_connections=30
-      -c wal_buffers=4MB
+      -c maintenance_work_mem=64MB
+      -c max_connections=40
     shm_size: 128mb
     volumes: [pgdata:/var/lib/postgresql/data]
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U bbd -d bigbillionday"]
+      test: ["CMD-SHELL", "pg_isready -U premiumshopy -d premiumshopy"]
       interval: 10s
       retries: 10
-    mem_limit: 300m
+    mem_limit: 512m
     logging: *logging
 
   # One-shot: DB migrations + admin/brand seed (and catalog import on demand). Not a long-running service.
   migrate:
-    image: ${MIGRATOR_IMAGE:-ghcr.io/mirachtechnologiess/bigbillionday-migrator}:${TAG:-latest}
+    image: ${MIGRATOR_IMAGE:-ghcr.io/mirachtechnologiess/premiumshopy-migrator}:${TAG:-latest}
     profiles: ["tools"]
     env_file: .env
     environment:
-      DATABASE_URL: postgresql://bbd:${POSTGRES_PASSWORD}@db:5432/bigbillionday?schema=public
+      DATABASE_URL: postgresql://premiumshopy:${POSTGRES_PASSWORD}@db:5432/premiumshopy?schema=public
       RUN_SEED: "true"
       SEED_DEMO: "false"
       UPLOAD_DIR: /app/storage/uploads
     volumes: [uploads:/app/storage/uploads]
     depends_on:
       db: { condition: service_healthy }
-    mem_limit: 512m
+    mem_limit: 768m
     logging: *logging
 
   web:
-    image: ${WEB_IMAGE:-ghcr.io/mirachtechnologiess/bigbillionday-web}:${TAG:-latest}
+    image: ${WEB_IMAGE:-ghcr.io/mirachtechnologiess/premiumshopy-web}:${TAG:-latest}
     restart: unless-stopped
     env_file: .env
     environment:
-      DATABASE_URL: postgresql://bbd:${POSTGRES_PASSWORD}@db:5432/bigbillionday?schema=public&connection_limit=5
+      DATABASE_URL: postgresql://premiumshopy:${POSTGRES_PASSWORD}@db:5432/premiumshopy?schema=public&connection_limit=8
       UPLOAD_DIR: /app/storage/uploads
       NODE_ENV: production
       # Keep V8 heap well inside the container limit so Node GCs before the kernel OOM-kills it.
-      NODE_OPTIONS: --max-old-space-size=384
+      NODE_OPTIONS: --max-old-space-size=768
     volumes:
       - uploads:/app/storage/uploads
       - nextcache:/app/.next/cache
     depends_on:
       db: { condition: service_healthy }
-    expose: ["3000"]
+    # Loopback only: reachable by the host's nginx, never directly from the internet.
+    ports: ["127.0.0.1:${WEB_PORT:-3600}:3000"]
     # Least privilege: no Linux capabilities, no setuid escalation (the app runs as non-root "nextjs").
     cap_drop: [ALL]
     security_opt: ["no-new-privileges:true"]
     pids_limit: 200
-    mem_limit: 640m
-    logging: *logging
-
-  caddy:
-    image: caddy:2.8-alpine
-    restart: unless-stopped
-    ports:
-      - "80:80"
-      - "443:443"
-      - "443:443/udp"
-    volumes:
-      - ./Caddyfile:/etc/caddy/Caddyfile:ro
-      - caddy_data:/data
-      - caddy_config:/config
-    depends_on: [web]
-    mem_limit: 96m
+    mem_limit: 1g
     logging: *logging
 
 volumes:
   pgdata:
   uploads:
   nextcache:
-  caddy_data:
-  caddy_config:

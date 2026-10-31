@@ -25,7 +25,7 @@ export default function AdminLoginForm({ next = "/admin", initialError = "" }) {
       // sent, and there is no race with redirects on slow connections or older browsers.
       let target = next || "/admin";
       if (window.location.hostname.startsWith("admin.") && (target === "/admin" || target.startsWith("/admin/"))) {
-        target = target.slice(6) || "/"; // admin.bigbillionday.store serves /admin/* at clean paths
+        target = target.slice(6) || "/"; // admin.premiumshopy.com serves /admin/* at clean paths
       }
       window.location.assign(target);
     } catch (err) {
