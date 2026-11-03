@@ -139,7 +139,7 @@ export default function OrdersList({ rows, counts, page, pages, total }) {
                     </div>
                     <div className="text-right">
                       <div className="a-num text-[14px]">{formatINR(o.total)}</div>
-                      <div className="text-[11px] text-mute">{timeAgo(o.createdAt)}</div>
+                      <div className="text-[11px] text-mute">{fmtDate(o.createdAt, true)} · {timeAgo(o.createdAt)}</div>
                     </div>
                   </div>
                   <div className="mt-2 flex flex-wrap items-center gap-1.5">
@@ -202,9 +202,12 @@ export default function OrdersList({ rows, counts, page, pages, total }) {
                     </td>
                     <td><OrderStatusPill status={o.status} /></td>
                     <td><RiskPill score={o.riskScore} reason={o.riskReason} /></td>
-                    <td className="whitespace-nowrap text-[12px] text-mute" title={fmtDate(o.createdAt, true)}>
-                      <CalendarRange className="mr-1 inline h-3 w-3" />
-                      {timeAgo(o.createdAt)}
+                    <td className="whitespace-nowrap text-[12px]">
+                      <div className="text-bone">
+                        <CalendarRange className="mr-1 inline h-3 w-3 text-mute" />
+                        {fmtDate(o.createdAt, true)}
+                      </div>
+                      <div className="pl-4 text-[11px] text-mute">{timeAgo(o.createdAt)}</div>
                     </td>
                   </tr>
                 ))}
