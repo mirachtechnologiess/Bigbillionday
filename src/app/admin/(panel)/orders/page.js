@@ -22,6 +22,8 @@ export default async function OrdersPage({ searchParams }) {
       select: {
         id: true, orderNumber: true, createdAt: true, shippingName: true, phone: true, email: true, city: true, state: true,
         total: true, status: true, paymentMethod: true, paymentStatus: true, riskScore: true, riskReason: true,
+        courier: true, trackingNumber: true,
+        shipment: { select: { awb: true, courierName: true, status: true, cancelledAt: true } },
         _count: { select: { items: true } },
         items: { select: { quantity: true, image: true, name: true }, take: 3 },
       },

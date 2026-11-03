@@ -74,6 +74,10 @@ select.a-input option { background: var(--color-ink); color: var(--color-bone); 
 .a-table tbody tr { transition: background .15s; }
 .a-table tbody tr:hover { background: var(--color-ink-2); }
 .a-table tbody tr[data-selected="true"] { background: var(--color-gold-3); }
+/* Last column pinned to the right edge (e.g. the orders "Ship" action) so it never scrolls out of view */
+.a-table .a-sticky-end { position: sticky; right: 0; z-index: 1; background: var(--color-ink); box-shadow: -8px 0 12px -10px rgb(17 24 39 / .25); }
+.a-table thead .a-sticky-end { z-index: 3; background: var(--color-ink-2); }
+.a-table tbody tr[data-selected="true"] .a-sticky-end { background: var(--color-gold-3); }
 .a-table tbody tr:last-child td { border-bottom: 0; }
 .a-num { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
 

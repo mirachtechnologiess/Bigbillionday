@@ -51,6 +51,7 @@ export default async function OrderPage({ params }) {
       include: {
         items: { include: { product: { select: { id: true, slug: true, stock: true } } } },
         events: { orderBy: { createdAt: "desc" } },
+        shipment: true,
         user: { select: { id: true, name: true, email: true, isBlocked: true, _count: { select: { orders: true } } } },
       },
     }),
@@ -64,6 +65,7 @@ export default async function OrderPage({ params }) {
     createdAt: order.createdAt.toISOString(),
     updatedAt: order.updatedAt.toISOString(),
     events: order.events.map((e) => ({ ...e, createdAt: e.createdAt.toISOString() })),
+    shipment: order.shipment && JSON.parse(JSON.stringify(order.shipment)),
   };
 
   return <OrderDetail order={data} history={history} allowed={allowedTransitions(order.status)} storeName={settings.store.name} />;

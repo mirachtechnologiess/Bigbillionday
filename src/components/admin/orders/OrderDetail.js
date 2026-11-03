@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
@@ -11,6 +11,8 @@ import { toast } from "sonner";
 import { cn, formatINR, ORDER_FLOW, ORDER_STATUS_LABEL, storeUrl } from "@/lib/utils";
 import { api } from "../fetcher";
 import { Card, CopyButton, Field, Modal, OrderStatusPill, PageHeader, PAYMENT_TONE, Pill, RiskPill, Spinner, fmtDate, timeAgo } from "../ui";
+import ShipModal from "../shipping/ShipModal";
+import { ShipmentCard, TrackingTimeline, isActiveShipment } from "../shipping/ShipmentPanel";
 
 const ACTION_META = {
   CANCELLED: { label: "Cancel order", icon: Ban, cls: "a-btn-danger" },
@@ -64,6 +66,10 @@ export default function OrderDetail({ order: o, history, allowed, storeName }) {
   const [internal, setInternal] = useState("");
   const [noteBusy, setNoteBusy] = useState(false);
   const [shipEdit, setShipEdit] = useState(false);
+  const [shipOpen, setShipOpen] = useState(false);
+  const shipment = isActiveShipment(o.shipment) ? o.shipment : null;
+  const canBook = !shipment && ["PENDING", "CONFIRMED", "PACKED"].includes(o.status);
+  const closeShip = useCallback(() => setShipOpen(false), []);
 
   const flowIdx = ORDER_FLOW.indexOf(o.status);
   const offFlow = flowIdx === -1;
@@ -155,6 +161,11 @@ export default function OrderDetail({ order: o, history, allowed, storeName }) {
               <a className="a-btn a-btn-ghost" target="_blank" rel="noreferrer" href={`https://wa.me/${wa}?text=${encodeURIComponent(waMessage(o, storeName, "shipped"))}`}>
                 <Truck /> Shipped msg
               </a>
+            )}
+            {canBook && (
+              <button type="button" className="a-btn a-btn-gold" onClick={() => setShipOpen(true)}>
+                <Truck /> Ship with Shiprocket
+              </button>
             )}
             <Link className="a-btn a-btn-ghost" href={`/admin/orders/${o.id}/invoice?type=slip`}>
               <ClipboardList /> Packing slip
@@ -276,6 +287,8 @@ export default function OrderDetail({ order: o, history, allowed, storeName }) {
             </dl>
           </Card>
 
+          {shipment && <TrackingTimeline shipment={shipment} />}
+
           <CustomerHistory history={history} />
 
           {/* Timeline */}
@@ -362,9 +375,11 @@ export default function OrderDetail({ order: o, history, allowed, storeName }) {
           <Card
             title="Shipping"
             icon={Truck}
-            actions={!shipEdit && <button className="a-btn a-btn-sm a-btn-ghost" onClick={() => setShipEdit(true)}>Edit</button>}
+            actions={!shipment && !shipEdit && <button className="a-btn a-btn-sm a-btn-ghost" onClick={() => setShipEdit(true)}>Edit</button>}
           >
-            {shipEdit ? (
+            {shipment ? (
+              <ShipmentCard orderId={o.id} orderStatus={o.status} shipment={shipment} />
+            ) : shipEdit ? (
               <div className="space-y-2">
                 <Field label="Courier"><input className="a-input" value={courier} onChange={(e) => setCourier(e.target.value)} placeholder="Delhivery, Blue Dart…" /></Field>
                 <Field label="Tracking number"><input className="a-input a-num" value={tracking} onChange={(e) => setTracking(e.target.value)} /></Field>
@@ -386,6 +401,11 @@ export default function OrderDetail({ order: o, history, allowed, storeName }) {
               </div>
             ) : (
               <p className="text-[12.5px] text-mute">Not shipped yet. Courier & tracking are captured when you mark it shipped.</p>
+            )}
+            {canBook && (
+              <button type="button" className="a-btn a-btn-sm a-btn-gold mt-3 w-full" onClick={() => setShipOpen(true)}>
+                <Truck /> Ship with Shiprocket
+              </button>
             )}
           </Card>
 
@@ -451,6 +471,8 @@ export default function OrderDetail({ order: o, history, allowed, storeName }) {
           </Field>
         </div>
       </Modal>
+
+      <ShipModal orderId={o.id} orderNumber={o.orderNumber} open={shipOpen} onClose={closeShip} onBooked={() => router.refresh()} />
     </div>
   );
 }

@@ -3,6 +3,7 @@ import { db } from "@/lib/db";
 import { ok } from "@/lib/api";
 import { adminRoute, readJson, HttpError } from "@/lib/admin-api";
 import { ORDER_STATUSES, PAYMENT_STATUSES, updateOrder } from "@/lib/admin-orders";
+import { cancelShipment } from "@/lib/shiprocket";
 
 export const GET = adminRoute(async (req, { params }) => {
   const order = await db.order.findUnique({
@@ -28,6 +29,11 @@ const schema = z.object({
 
 export const PATCH = adminRoute(async (req, { params, user }) => {
   const body = await readJson(req, schema);
+  if (body.status === "CANCELLED") {
+    // stop the courier first — if Shiprocket refuses, the order stays open and the error is shown
+    const sh = await db.shipment.findUnique({ where: { orderId: params.id }, select: { awb: true, cancelledAt: true, closed: true } });
+    if (sh?.awb && !sh.cancelledAt && !sh.closed) await cancelShipment(params.id, user);
+  }
   const order = await updateOrder(params.id, body, user);
   return ok({ order });
 });

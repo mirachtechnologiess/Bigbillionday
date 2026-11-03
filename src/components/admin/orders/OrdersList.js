@@ -1,18 +1,41 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { CalendarRange, Download, PackageCheck, ShoppingBag, X } from "lucide-react";
+import { CalendarRange, Download, PackageCheck, RefreshCw, ShoppingBag, Truck, X } from "lucide-react";
 import { toast } from "sonner";
 import { cn, formatINR, ORDER_STATUS_LABEL } from "@/lib/utils";
 import { api } from "../fetcher";
 import {
   Empty, OrderStatusPill, PageHeader, Pagination, PAYMENT_TONE, Pill, RiskPill, SearchInput, Spinner, Tabs, fmtDate, timeAgo, useQueryState,
 } from "../ui";
+import ShipModal from "../shipping/ShipModal";
+import { shipTone } from "../shipping/ShipmentPanel";
 
 const STATUS_TABS = ["PENDING", "CONFIRMED", "PACKED", "SHIPPED", "OUT_FOR_DELIVERY", "DELIVERED", "CANCELLED", "RETURN_REQUESTED", "RETURNED"];
 const BULK = ["CONFIRMED", "PACKED", "OUT_FOR_DELIVERY", "DELIVERED", "CANCELLED"];
+const SHIPPABLE = ["PENDING", "CONFIRMED", "PACKED"];
+
+/** Last column: booked shipment (courier, AWB, live status) or the one-click "Ship" button. */
+function ShippingCell({ o, onShip }) {
+  const sh = o.shipment;
+  if (sh?.awb && !sh.cancelledAt) {
+    return (
+      <div className="min-w-[130px] text-[11.5px]">
+        <Pill tone={shipTone(sh.status)}>{sh.status || "Booked"}</Pill>
+        <div className="mt-1 truncate text-mute" title={`${sh.courierName} · ${sh.awb}`}>{sh.courierName}</div>
+        <div className="a-num text-mute">{sh.awb}</div>
+      </div>
+    );
+  }
+  if (!SHIPPABLE.includes(o.status)) return <span className="text-[11.5px] text-mute">{o.trackingNumber ? `${o.courier || "Manual"} · ${o.trackingNumber}` : "—"}</span>;
+  return (
+    <button type="button" className="a-btn a-btn-sm a-btn-gold whitespace-nowrap" onClick={() => onShip(o)}>
+      <Truck /> Ship
+    </button>
+  );
+}
 
 export default function OrdersList({ rows, counts, page, pages, total }) {
   const router = useRouter();
@@ -21,6 +44,23 @@ export default function OrdersList({ rows, counts, page, pages, total }) {
   const [selected, setSelected] = useState(() => new Set());
   const [bulkStatus, setBulkStatus] = useState("CONFIRMED");
   const [busy, setBusy] = useState(false);
+  const [shipFor, setShipFor] = useState(null);
+  const [syncing, setSyncing] = useState(false);
+  const closeShip = useCallback(() => setShipFor(null), []);
+
+  async function syncTracking() {
+    setSyncing(true);
+    try {
+      const r = await api("/api/admin/shipping/sync", { method: "POST" });
+      if (r.skipped) toast.info("Shiprocket is not connected yet — Settings → Shipping");
+      else toast.success(r.checked ? `Tracking refreshed for ${r.checked} shipment${r.checked === 1 ? "" : "s"}${r.failed ? ` (${r.failed} failed)` : ""}` : "No open shipments to refresh");
+      router.refresh();
+    } catch (e) {
+      toast.error(e.message);
+    } finally {
+      setSyncing(false);
+    }
+  }
 
   // drop selection when the data set changes
   const key = rows.map((r) => r.id).join(",");
@@ -66,9 +106,14 @@ export default function OrdersList({ rows, counts, page, pages, total }) {
         title="Orders"
         description="Every order from checkout to doorstep. Filter, verify COD risk, and move them along the line."
         actions={
-          <a href={exportHref} className="a-btn a-btn-ghost" download>
-            <Download /> Export CSV
-          </a>
+          <>
+            <button type="button" className="a-btn a-btn-ghost" onClick={syncTracking} disabled={syncing}>
+              {syncing ? <Spinner /> : <RefreshCw />} Sync tracking
+            </button>
+            <a href={exportHref} className="a-btn a-btn-ghost" download>
+              <Download /> Export CSV
+            </a>
+          </>
         }
       />
 
@@ -167,6 +212,7 @@ export default function OrdersList({ rows, counts, page, pages, total }) {
                   <th>Status</th>
                   <th>Risk</th>
                   <th>Placed</th>
+                  <th className="a-sticky-end">Shipping</th>
                 </tr>
               </thead>
               <tbody>
@@ -179,7 +225,7 @@ export default function OrdersList({ rows, counts, page, pages, total }) {
                     <td>
                       <Link href={`/admin/orders/${o.id}`} className="a-num text-gold-2 hover:underline">#{o.orderNumber}</Link>
                     </td>
-                    <td className="max-w-[220px]">
+                    <td className="max-w-[190px]">
                       <div className="truncate font-medium">{o.shippingName}</div>
                       <div className="truncate text-[11.5px] text-mute">{o.phone} · {o.city}, {o.state}</div>
                     </td>
@@ -191,7 +237,7 @@ export default function OrdersList({ rows, counts, page, pages, total }) {
                             <img key={i} src={src} alt="" className="h-7 w-7 rounded-md border border-line-2 bg-ink-3 object-cover" />
                           ))}
                         </div>
-                        <span className="max-w-[160px] truncate text-[12px] text-bone-2" title={o.firstItem}>
+                        <span className="max-w-[120px] truncate text-[12px] text-bone-2" title={o.firstItem}>
                           {o.itemCount > 1 ? `${o.itemCount} items` : o.firstItem}
                         </span>
                       </div>
@@ -209,6 +255,7 @@ export default function OrdersList({ rows, counts, page, pages, total }) {
                       </div>
                       <div className="pl-4 text-[11px] text-mute">{timeAgo(o.createdAt)}</div>
                     </td>
+                    <td className="a-sticky-end"><ShippingCell o={o} onShip={setShipFor} /></td>
                   </tr>
                 ))}
               </tbody>
@@ -227,6 +274,10 @@ export default function OrdersList({ rows, counts, page, pages, total }) {
           <Pagination page={page} pages={pages} total={total} />
         </div>
       </div>
+
+      {shipFor && (
+        <ShipModal orderId={shipFor.id} orderNumber={shipFor.orderNumber} open onClose={closeShip} onBooked={() => router.refresh()} />
+      )}
     </div>
   );
 }

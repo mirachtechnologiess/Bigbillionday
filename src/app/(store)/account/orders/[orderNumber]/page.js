@@ -24,6 +24,8 @@ export default async function AccountOrderDetail({ params }) {
     include: orderInclude,
   });
   if (!order) notFound();
+  const shipment = await db.shipment.findUnique({ where: { orderId: order.id }, select: { trackUrl: true, cancelledAt: true } });
+  const trackUrl = shipment && !shipment.cancelledAt ? shipment.trackUrl : null;
   const payLabel =
     order.paymentMethod === "COD"
       ? order.paymentStatus === "PAID"
@@ -55,6 +57,14 @@ export default async function AccountOrderDetail({ params }) {
           {order.trackingNumber && (
             <p className="text-[13px] text-bone-2">
               {order.courier || "Courier"} · AWB <span className="font-mono text-bone">{order.trackingNumber}</span>
+              {trackUrl && (
+                <>
+                  {" · "}
+                  <a href={trackUrl} target="_blank" rel="noreferrer" className="font-semibold text-gold-2 hover:underline">
+                    Track your parcel
+                  </a>
+                </>
+              )}
             </p>
           )}
           {CANCELLABLE.includes(order.status) && <CancelOrderButton orderNumber={order.orderNumber} />}

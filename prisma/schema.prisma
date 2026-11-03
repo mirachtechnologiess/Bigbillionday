@@ -294,6 +294,7 @@ model Order {
   updatedAt      DateTime      @updatedAt
   items          OrderItem[]
   events         OrderEvent[]
+  shipment       Shipment?
 
   @@index([status, createdAt])
   @@index([phone])
@@ -320,6 +321,46 @@ model OrderEvent {
   status    OrderStatus
   note      String?
   createdAt DateTime    @default(now())
+}
+
+/// Courier shipment booked through Shiprocket (one active shipment per order; re-booking after a
+/// cancellation reuses the row with attempt+1, because Shiprocket rejects reused order ids).
+model Shipment {
+  id                String    @id @default(cuid())
+  orderId           String    @unique
+  order             Order     @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  provider          String    @default("shiprocket")
+  attempt           Int       @default(1)
+  channelOrderId    String
+  srOrderId         String?
+  srShipmentId      String?
+  awb               String?
+  courierId         Int?
+  courierName       String?
+  charge            Float?
+  status            String?
+  pickupScheduledAt String?
+  pickupToken       String?
+  labelUrl          String?
+  manifestUrl       String?
+  trackUrl          String?
+  etd               String?
+  weightKg          Float
+  lengthCm          Int
+  breadthCm         Int
+  heightCm          Int
+  activities        Json?
+  rto               Boolean   @default(false)
+  closed            Boolean   @default(false)
+  deliveredAt       DateTime?
+  cancelledAt       DateTime?
+  lastSyncedAt      DateTime?
+  lastError         String?
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
+  @@index([awb])
+  @@index([closed, lastSyncedAt])
 }
 
 model Banner {

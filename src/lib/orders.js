@@ -65,8 +65,30 @@ export async function getOrderForViewer(orderNumber, token) {
   return null;
 }
 
-export const timelineFromEvents = (events = []) =>
-  events.map((e) => ({ status: e.status, label: ORDER_STATUS_LABEL[e.status] || e.status, note: e.note || null, at: e.createdAt }));
+// Staff-only notes (internal notes, payment/shipping edits, courier booking incl. our shipping cost)
+const INTERNAL_NOTE = /^(Note\b|Payment marked|Shipping details updated|Booked on Shiprocket|Shiprocket shipment cancelled|Bulk update)/;
+
+/**
+ * Customer-facing timeline: internal notes are hidden, and events that only carried an internal note
+ * (no status change) are dropped entirely.
+ */
+export const timelineFromEvents = (events = []) => {
+  const asc = [...events].sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
+  const keep = new Set();
+  let prev = null;
+  for (const e of asc) {
+    if (e.status !== prev || !INTERNAL_NOTE.test(e.note || "")) keep.add(e);
+    prev = e.status;
+  }
+  return events
+    .filter((e) => keep.has(e))
+    .map((e) => ({
+      status: e.status,
+      label: ORDER_STATUS_LABEL[e.status] || e.status,
+      note: e.note && !INTERNAL_NOTE.test(e.note) ? e.note : null,
+      at: e.createdAt,
+    }));
+};
 
 export const CANCELLABLE = ["PENDING", "CONFIRMED"];
 

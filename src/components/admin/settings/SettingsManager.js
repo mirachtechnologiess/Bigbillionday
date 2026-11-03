@@ -10,6 +10,7 @@ import { Card, Field, ImagePicker, PageHeader, Pill, Spinner, Tabs, Toggle, useQ
 import { cn, formatINR } from "@/lib/utils";
 import { SeoPreview } from "@/components/admin/brands/shared";
 import NvidiaKeyCard from "@/components/admin/settings/NvidiaKeyCard";
+import ShiprocketCard from "@/components/admin/settings/ShiprocketCard";
 
 const GROUPS = {
   store: { label: "Store", icon: Store, blurb: "Identity and contact details shown in the header, footer, invoices and emails." },
@@ -163,6 +164,7 @@ export default function SettingsManager({ initial, defaults, tab: initialTab, is
           <p className="border-b border-line px-4 py-3 text-[12.5px] text-mute">{GROUPS[tab].blurb}</p>
 
           {tab === "ai" && <NvidiaKeyCard isAdmin={isAdmin} />}
+          {tab === "shipping" && <ShiprocketCard isAdmin={isAdmin} />}
 
           <fieldset disabled={!isAdmin} className="grid gap-x-4 gap-y-5 p-4 sm:grid-cols-2">
             {keys.map((k) => (
