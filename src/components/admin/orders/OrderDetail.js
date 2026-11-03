@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
   Ban, Check, ChevronRight, CircleDollarSign, ClipboardList, CreditCard, ExternalLink, FileText, MapPin, MessageCircle, MessageSquarePlus,
-  Package, PackageOpen, RotateCcw, ShieldAlert, Truck, Undo2, User,
+  History, Package, PackageOpen, RotateCcw, ShieldAlert, Truck, Undo2, User,
 } from "lucide-react";
 import { toast } from "sonner";
 import { cn, formatINR, ORDER_FLOW, ORDER_STATUS_LABEL, storeUrl } from "@/lib/utils";
@@ -54,7 +54,7 @@ function waMessage(o, storeName, kind) {
   ].join("\n");
 }
 
-export default function OrderDetail({ order: o, allowed, storeName }) {
+export default function OrderDetail({ order: o, history, allowed, storeName }) {
   const router = useRouter();
   const [target, setTarget] = useState(null); // status being moved to
   const [note, setNote] = useState("");
@@ -276,6 +276,8 @@ export default function OrderDetail({ order: o, allowed, storeName }) {
             </dl>
           </Card>
 
+          <CustomerHistory history={history} />
+
           {/* Timeline */}
           <Card title="Timeline" icon={ClipboardList}>
             <form method="post" onSubmit={addNote} className="mb-4 flex gap-2">
@@ -450,6 +452,89 @@ export default function OrderDetail({ order: o, allowed, storeName }) {
         </div>
       </Modal>
     </div>
+  );
+}
+
+const HISTORY_SUMMARY = [
+  { label: "Delivered", statuses: ["DELIVERED"], tone: "lume" },
+  { label: "Cancelled", statuses: ["CANCELLED"], tone: "danger" },
+  { label: "Returned", statuses: ["RETURN_REQUESTED", "RETURNED"], tone: "ember" },
+  { label: "In progress", statuses: ["PENDING", "CONFIRMED", "PACKED", "SHIPPED", "OUT_FOR_DELIVERY"], tone: "info" },
+];
+
+/** The same customer's other orders (matched by account, phone or email) with their outcome. */
+function CustomerHistory({ history }) {
+  const { orders = [], byStatus = {}, total = 0 } = history || {};
+  return (
+    <Card title={`Customer’s order history (${total} other)`} icon={History} bodyClass="!p-0">
+      {total === 0 ? (
+        <p className="p-4 text-[12.5px] text-mute">First order from this customer — no other orders with this phone, email or account.</p>
+      ) : (
+        <>
+          <div className="flex flex-wrap gap-2 border-b border-line p-3 sm:px-4">
+            {HISTORY_SUMMARY.map((s) => {
+              const n = s.statuses.reduce((sum, st) => sum + (byStatus[st] || 0), 0);
+              return n ? <Pill key={s.label} tone={s.tone}>{s.label} · {n}</Pill> : null;
+            })}
+          </div>
+          <div className="overflow-x-auto">
+            <table className="a-table w-full">
+              <thead>
+                <tr>
+                  <th>Order</th>
+                  <th>Placed</th>
+                  <th>Items</th>
+                  <th className="text-right">Total</th>
+                  <th>Payment</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                {orders.map((h) => {
+                  const first = h.items[0];
+                  const qty = h.items.reduce((n, it) => n + it.quantity, 0);
+                  return (
+                    <tr key={h.id}>
+                      <td className="whitespace-nowrap">
+                        <Link href={`/admin/orders/${h.id}`} className="a-num text-[12.5px] text-gold-2 hover:underline">#{h.orderNumber}</Link>
+                      </td>
+                      <td className="whitespace-nowrap text-[12px]">
+                        <div>{fmtDate(h.createdAt, true)}</div>
+                        <div className="text-[11px] text-mute">{timeAgo(h.createdAt)}</div>
+                      </td>
+                      <td>
+                        <div className="flex min-w-[180px] items-center gap-2">
+                          <div className="h-8 w-8 flex-none overflow-hidden rounded border border-line bg-ink-3">
+                            {first?.image && (
+                              // eslint-disable-next-line @next/next/no-img-element
+                              <img src={first.image} alt="" className="h-full w-full object-cover" />
+                            )}
+                          </div>
+                          <div className="min-w-0 text-[12.5px]">
+                            <div className="line-clamp-1">{first?.name || "—"}</div>
+                            {(h.items.length > 1 || qty > 1) && (
+                              <div className="text-[11px] text-mute">
+                                {qty} item{qty === 1 ? "" : "s"}{h.items.length > 1 ? ` · +${h.items.length - 1} more` : ""}
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      </td>
+                      <td className="a-num whitespace-nowrap text-right text-[12.5px]">{formatINR(h.total)}</td>
+                      <td className="whitespace-nowrap">
+                        <Pill tone={PAYMENT_TONE[h.paymentStatus]} dot={false}>{h.paymentMethod === "COD" ? "COD" : "Prepaid"} · {h.paymentStatus.toLowerCase()}</Pill>
+                      </td>
+                      <td className="whitespace-nowrap"><OrderStatusPill status={h.status} /></td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+          {total > orders.length && <p className="border-t border-line p-3 text-[11.5px] text-mute sm:px-4">Showing the latest {orders.length} of {total}.</p>}
+        </>
+      )}
+    </Card>
   );
 }
 
