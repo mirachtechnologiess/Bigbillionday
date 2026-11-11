@@ -44,7 +44,8 @@ export default function AdminLoginForm({ next = "/admin", initialError = "" }) {
         {Array.from({ length: 60 }, (_, i) => {
           const a = (i / 60) * Math.PI * 2;
           const r1 = i % 5 === 0 ? 255 : 270;
-          return <line key={i} x1={300 + Math.cos(a) * r1} y1={300 + Math.sin(a) * r1} x2={300 + Math.cos(a) * 285} y2={300 + Math.sin(a) * 285} stroke="#f2600c" strokeWidth={i % 5 === 0 ? 3 : 1} />;
+          const r2 = (n) => Math.round(n * 100) / 100; // identical on server and browser (no float-tail hydration mismatch)
+          return <line key={i} x1={r2(300 + Math.cos(a) * r1)} y1={r2(300 + Math.sin(a) * r1)} x2={r2(300 + Math.cos(a) * 285)} y2={r2(300 + Math.sin(a) * 285)} stroke="#f2600c" strokeWidth={i % 5 === 0 ? 3 : 1} />;
         })}
       </svg>
       <motion.form

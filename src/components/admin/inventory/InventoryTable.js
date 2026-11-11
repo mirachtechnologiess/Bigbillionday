@@ -24,7 +24,7 @@ export default function InventoryTable({ tab, rows, counts, page, pages, total }
       <Tabs
         className="mb-4"
         value={tab}
-        onChange={(v) => set({ tab: v === "low" ? null : v })}
+        onChange={(v) => set({ tab: v === "low" ? null : v }, { history: "push" })}
         tabs={[
           { value: "out", label: "Out of stock", count: counts.out },
           { value: "low", label: "Low stock", count: counts.low },

@@ -29,7 +29,7 @@ async function customerHistory(order) {
       orderBy: { createdAt: "desc" },
       take: HISTORY_LIMIT,
       select: {
-        id: true, orderNumber: true, createdAt: true, status: true, total: true, paymentMethod: true, paymentStatus: true,
+        id: true, serialNo: true, orderNumber: true, createdAt: true, status: true, total: true, paymentMethod: true, paymentStatus: true,
         items: { select: { name: true, image: true, quantity: true } },
       },
     }),

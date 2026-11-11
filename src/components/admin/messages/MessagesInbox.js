@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { ChevronLeft, Inbox, Mail, MailOpen, MessageCircle, Phone, Trash2 } from "lucide-react";
 import { api } from "@/components/admin/fetcher";
-import { ConfirmButton, CopyButton, Empty, PageHeader, SearchInput, Tabs, fmtDate, timeAgo, useQueryState } from "@/components/admin/ui";
+import { ConfirmButton, CopyButton, Empty, PageHeader, SearchInput, Tabs, fmtDate, TimeAgo, useQueryState } from "@/components/admin/ui";
 import { cn } from "@/lib/utils";
 
 function waNumber(phone) {
@@ -83,7 +83,7 @@ export default function MessagesInbox({ messages, unread, total, filter, initial
               <SearchInput placeholder="Search name, email, phone, text…" />
               <Tabs
                 value={filter}
-                onChange={(v) => set({ filter: v === "all" ? null : v })}
+                onChange={(v) => set({ filter: v === "all" ? null : v }, { history: "push" })}
                 tabs={[
                   { value: "all", label: "All", count: total },
                   { value: "unread", label: "Unread", count: unreadCount },
@@ -109,7 +109,7 @@ export default function MessagesInbox({ messages, unread, total, filter, initial
                       <div className="flex items-center gap-2">
                         <span className={cn("h-1.5 w-1.5 flex-none rounded-full", m.isRead ? "bg-transparent" : "bg-gold shadow-[0_0_6px_rgb(242_96_12/.6)]")} />
                         <span className={cn("min-w-0 flex-1 truncate text-[13px]", m.isRead ? "text-bone-2" : "font-semibold text-bone")}>{m.name}</span>
-                        <span className="a-num flex-none text-[10.5px] text-mute">{timeAgo(m.createdAt)}</span>
+                        <span className="a-num flex-none text-[10.5px] text-mute"><TimeAgo date={m.createdAt} /></span>
                       </div>
                       <div className={cn("mt-0.5 truncate pl-3.5 text-[11.5px]", m.isRead ? "text-mute" : "text-bone-2")}>{m.email}</div>
                       <div className={cn("mt-1 line-clamp-2 pl-3.5 text-[12px]", m.isRead ? "text-mute" : "text-bone-2")}>{m.message}</div>
@@ -169,7 +169,7 @@ function MessagePanel({ m, storeName, canDelete, onBack, onToggleRead, onDelete 
                 </a>
               )}
             </div>
-            <div className="a-num mt-0.5 text-[11px] text-mute">{fmtDate(m.createdAt, true)} IST · {timeAgo(m.createdAt)}</div>
+            <div className="a-num mt-0.5 text-[11px] text-mute">{fmtDate(m.createdAt, true)} IST · <TimeAgo date={m.createdAt} /></div>
           </div>
         </div>
         <div className="flex items-center gap-1.5">

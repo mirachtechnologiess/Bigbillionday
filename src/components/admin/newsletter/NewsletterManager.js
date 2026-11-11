@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { CalendarDays, ClipboardCopy, Download, Mail, Newspaper, Trash2, TrendingUp, Users } from "lucide-react";
 import { api, downloadFile } from "@/components/admin/fetcher";
-import { ConfirmButton, CopyButton, Empty, PageHeader, Pagination, SearchInput, Spinner, Stat, fmtDate, timeAgo } from "@/components/admin/ui";
+import { ConfirmButton, CopyButton, Empty, PageHeader, Pagination, SearchInput, Spinner, Stat, fmtDate, TimeAgo } from "@/components/admin/ui";
 
 export default function NewsletterManager({ subscribers, stats, page, pages, matching, q, canDelete }) {
   const router = useRouter();
@@ -112,7 +112,7 @@ export default function NewsletterManager({ subscribers, stats, page, pages, mat
                 <tr key={s.id}>
                   <td className="font-mono text-[12.5px]">{s.email}</td>
                   <td className="a-num whitespace-nowrap text-[12px] text-bone-2">{fmtDate(s.createdAt, true)}</td>
-                  <td className="hidden text-[12px] text-mute sm:table-cell">{timeAgo(s.createdAt)}</td>
+                  <td className="hidden text-[12px] text-mute sm:table-cell"><TimeAgo date={s.createdAt} /></td>
                   <td>
                     <div className="flex justify-end gap-1">
                       <CopyButton text={s.email} className="a-btn a-btn-ghost a-btn-sm a-btn-icon" />

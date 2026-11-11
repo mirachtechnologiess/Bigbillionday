@@ -6,7 +6,7 @@ import { toast } from "sonner";
 import { Ban, ExternalLink, FileDown, MapPin, Navigation, RefreshCw, Route, Truck } from "lucide-react";
 import { cn, formatINR } from "@/lib/utils";
 import { api } from "../fetcher";
-import { Card, ConfirmButton, CopyButton, Pill, Spinner, fmtDate, timeAgo } from "../ui";
+import { Card, ConfirmButton, CopyButton, Pill, Spinner, fmtDate, TimeAgo } from "../ui";
 
 const STALE_MS = 15 * 60_000;
 
@@ -125,7 +125,7 @@ export function ShipmentCard({ orderId, orderStatus, shipment: sh }) {
         )}
       </div>
       <p className="text-[11px] text-mute">
-        {sh.lastSyncedAt ? `Tracking checked ${timeAgo(sh.lastSyncedAt)}` : "Waiting for the first tracking update"} · updates arrive automatically
+        {sh.lastSyncedAt ? `Tracking checked $<TimeAgo date={sh.lastSyncedAt} />` : "Waiting for the first tracking update"} · updates arrive automatically
       </p>
     </div>
   );

@@ -7,7 +7,7 @@ import { Ban, ShieldCheck, Trash2, UserPlus, Users, UserCheck } from "lucide-rea
 import { toast } from "sonner";
 import { cn, formatINR } from "@/lib/utils";
 import { api } from "../fetcher";
-import { ConfirmButton, Empty, Field, Modal, PageHeader, Pagination, Pill, SearchInput, Spinner, Tabs, fmtDate, timeAgo, useQueryState } from "../ui";
+import { ConfirmButton, Empty, Field, Modal, PageHeader, Pagination, Pill, SearchInput, Spinner, Tabs, fmtDate, TimeAgo, useQueryState } from "../ui";
 
 export const ROLE_TONE = { ADMIN: "gold", STAFF: "info", CUSTOMER: "mute" };
 
@@ -99,7 +99,7 @@ export default function CustomersList({ tab, rows, counts, page, pages, total, m
       <Tabs
         className="mb-4"
         value={tab}
-        onChange={(v) => set({ tab: v === "staff" ? "staff" : null, q: null, blocked: null })}
+        onChange={(v) => set({ tab: v === "staff" ? "staff" : null, q: null, blocked: null }, { history: "push" })}
         tabs={[
           { value: "customers", label: "Customers", count: counts.customers },
           { value: "staff", label: "Staff & admins", count: counts.staff, icon: ShieldCheck },
@@ -173,7 +173,7 @@ export default function CustomersList({ tab, rows, counts, page, pages, total, m
                     <td className="a-num text-bone-2">{u.phone || "—"}</td>
                     <td className="a-num text-right">{u.orders}</td>
                     <td className="a-num text-right">{formatINR(u.spent)}</td>
-                    <td className="whitespace-nowrap text-[12px] text-mute" title={u.lastOrderAt ? `Last order ${timeAgo(u.lastOrderAt)}` : undefined}>{fmtDate(u.createdAt)}</td>
+                    <td className="whitespace-nowrap text-[12px] text-mute" title={u.lastOrderAt ? `Last order $<TimeAgo date={u.lastOrderAt} />` : undefined}>{fmtDate(u.createdAt)}</td>
                     <td>{u.isBlocked ? <Pill tone="danger">Blocked</Pill> : <Pill tone="lume">Active</Pill>}</td>
                     <td className="text-right">{staff ? staffActions(u) : <div className="flex justify-end">{blockBtn(u)}</div>}</td>
                   </tr>

@@ -43,14 +43,22 @@ export function orderWhere(params = {}, { withStatus = true } = {}) {
   const q = get("q").trim();
   if (q) {
     const digits = q.replace(/\D/g, "");
-    and.push({
-      OR: [
-        { orderNumber: { contains: q.replace(/^#/, ""), mode: "insensitive" } },
-        { shippingName: { contains: q, mode: "insensitive" } },
-        { email: { contains: q, mode: "insensitive" } },
-        ...(digits.length >= 4 ? [{ phone: { contains: digits.slice(-10) } }] : []),
-      ],
-    });
+    if (/^#?\d{1,4}$/.test(q)) {
+      // a short number is an S.No ("35" → order 35)
+      and.push({ serialNo: Number(digits) });
+    } else if (/^#?\d{5,}$/.test(q)) {
+      // a longer number: phone (partial) or S.No
+      and.push({ OR: [{ phone: { contains: digits.slice(-10) } }, ...(digits.length <= 9 ? [{ serialNo: Number(digits) }] : [])] });
+    } else {
+      and.push({
+        OR: [
+          { orderNumber: { contains: q.replace(/^#/, ""), mode: "insensitive" } },
+          { shippingName: { contains: q, mode: "insensitive" } },
+          { email: { contains: q, mode: "insensitive" } },
+          ...(digits.length >= 4 ? [{ phone: { contains: digits.slice(-10) } }] : []),
+        ],
+      });
+    }
   }
   const from = get("from");
   const to = get("to");

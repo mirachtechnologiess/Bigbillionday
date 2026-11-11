@@ -61,9 +61,9 @@ export function PageHeader({ eyebrow, title, description, actions, back }) {
     <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
       <div className="min-w-0">
         {back && (
-          <Link href={back} className="mb-2 inline-flex items-center gap-1 text-xs text-mute hover:text-bone">
+          <BackLink href={back} className="mb-2 inline-flex items-center gap-1 text-xs text-mute hover:text-bone">
             <ChevronLeft className="h-3.5 w-3.5" /> Back
-          </Link>
+          </BackLink>
         )}
         {eyebrow && <div className="eyebrow mb-1.5 !text-[10px]">{eyebrow}</div>}
         <h1 className="font-display text-[30px] leading-none tracking-tight sm:text-[36px]">{title}</h1>
@@ -266,12 +266,9 @@ export function SearchInput({ param = "q", placeholder = "Search…", className 
   const sp = useSearchParams();
   const [v, setV] = useState(sp.get(param) || "");
   const [pending, start] = useTransition();
-  const first = useRef(true);
   useEffect(() => {
-    if (first.current) {
-      first.current = false;
-      return;
-    }
+    // Only navigate when the text differs from the URL — never on mount/remount (that would reset ?page=)
+    if (v === (sp.get(param) || "")) return;
     const t = setTimeout(() => {
       const next = new URLSearchParams(sp.toString());
       if (v) next.set(param, v);
@@ -297,20 +294,58 @@ export function useQueryState() {
   const pathname = useAdminPathname();
   const sp = useSearchParams();
   const [pending, start] = useTransition();
-  const set = (patch, { resetPage = true } = {}) => {
+  /**
+   * history: "push" adds a browser-history entry (page / tab moves, so Back returns to them);
+   * "replace" (default) is for filters and search typing.
+   */
+  const set = (patch, { resetPage = true, history = "replace" } = {}) => {
     const next = new URLSearchParams(sp.toString());
     for (const [k, val] of Object.entries(patch)) {
       if (val === null || val === undefined || val === "") next.delete(k);
       else next.set(k, String(val));
     }
     if (resetPage && !("page" in patch)) next.delete("page");
-    start(() => router.replace(`${pathname}?${next.toString()}`));
+    const qs = next.toString();
+    const url = qs ? `${pathname}?${qs}` : pathname;
+    start(() => (history === "push" ? router.push(url) : router.replace(url, { scroll: false })));
   };
   return { sp, set, pending };
 }
 
+const LIST_URL_KEY = "admin:list-url:";
+
+/** Remember a list page's full URL (page, filters, tab) so detail pages can link straight back to it. */
+export function useRememberListUrl() {
+  const pathname = useAdminPathname();
+  const sp = useSearchParams();
+  const qs = sp.toString();
+  useEffect(() => {
+    try {
+      sessionStorage.setItem(LIST_URL_KEY + pathname, qs ? `${pathname}?${qs}` : pathname);
+    } catch {}
+  }, [pathname, qs]);
+}
+
+/** Back link that returns to the remembered list URL (e.g. page 4 of Orders), falling back to `href`. */
+export function BackLink({ href, className, children, ...rest }) {
+  const [to, setTo] = useState(href);
+  useEffect(() => {
+    if (href.includes("?")) return; // an explicit tab/filter wins
+    try {
+      const saved = sessionStorage.getItem(LIST_URL_KEY + href);
+      if (saved) setTo(saved);
+    } catch {}
+  }, [href]);
+  return (
+    <Link href={to} className={className} {...rest}>
+      {children}
+    </Link>
+  );
+}
+
 export function Pagination({ page, pages, total }) {
   const { set } = useQueryState();
+  useRememberListUrl();
   if (pages <= 1) return total !== undefined ? <div className="mt-3 text-xs text-mute">{total} result{total === 1 ? "" : "s"}</div> : null;
   return (
     <div className="mt-3 flex items-center justify-between gap-3 text-xs text-mute">
@@ -319,10 +354,10 @@ export function Pagination({ page, pages, total }) {
         {total !== undefined && <> · {total} results</>}
       </span>
       <div className="flex gap-1.5">
-        <button className="a-btn a-btn-sm a-btn-icon" disabled={page <= 1} onClick={() => set({ page: page - 1 }, { resetPage: false })} aria-label="Previous page">
+        <button className="a-btn a-btn-sm a-btn-icon" disabled={page <= 1} onClick={() => set({ page: page - 1 }, { resetPage: false, history: "push" })} aria-label="Previous page">
           <ChevronLeft />
         </button>
-        <button className="a-btn a-btn-sm a-btn-icon" disabled={page >= pages} onClick={() => set({ page: page + 1 }, { resetPage: false })} aria-label="Next page">
+        <button className="a-btn a-btn-sm a-btn-icon" disabled={page >= pages} onClick={() => set({ page: page + 1 }, { resetPage: false, history: "push" })} aria-label="Next page">
           <ChevronRight />
         </button>
       </div>
@@ -505,6 +540,16 @@ export function fmtDate(d, withTime = false) {
     ...(withTime ? { hour: "2-digit", minute: "2-digit" } : {}),
     timeZone: "Asia/Kolkata",
   });
+}
+
+/** "5m ago" that may tick over between server render and hydration — React is told that's expected. */
+export function TimeAgo({ date, className }) {
+  if (!date) return null;
+  return (
+    <time dateTime={new Date(date).toISOString()} title={fmtDate(date, true)} className={className} suppressHydrationWarning>
+      {timeAgo(date)}
+    </time>
+  );
 }
 
 export function timeAgo(d) {

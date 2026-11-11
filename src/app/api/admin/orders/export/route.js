@@ -3,7 +3,7 @@ import { adminRoute, toCsv, csvResponse } from "@/lib/admin-api";
 import { orderWhere } from "@/lib/admin-orders";
 
 const COLS = [
-  "orderNumber", "date", "status", "name", "email", "phone", "address", "city", "state", "pincode", "items", "itemCount",
+  "sNo", "orderNumber", "date", "status", "name", "email", "phone", "address", "city", "state", "pincode", "items", "itemCount",
   "subtotal", "discount", "couponCode", "shippingFee", "codFee", "total", "paymentMethod", "paymentStatus", "courier",
   "trackingNumber", "riskScore", "riskReason",
 ];
@@ -12,11 +12,12 @@ export const GET = adminRoute(async (req) => {
   const sp = new URL(req.url).searchParams;
   const orders = await db.order.findMany({
     where: orderWhere(sp),
-    orderBy: { createdAt: "desc" },
+    orderBy: { serialNo: "desc" },
     take: 10000,
     include: { items: { select: { sku: true, quantity: true } } },
   });
   const rows = orders.map((o) => ({
+    sNo: o.serialNo,
     orderNumber: o.orderNumber,
     date: o.createdAt.toISOString(),
     status: o.status,

@@ -11,7 +11,7 @@ import { toast } from "sonner";
 import { cn, formatINR, storeUrl } from "@/lib/utils";
 import { api } from "../fetcher";
 import {
-  ConfirmButton, Empty, Modal, Pagination, Pill, ProductStatusPill, SearchInput, Spinner, StockPill, Tabs, timeAgo, useQueryState,
+  ConfirmButton, Empty, Modal, Pagination, Pill, ProductStatusPill, SearchInput, Spinner, StockPill, Tabs, TimeAgo, useQueryState,
 } from "../ui";
 
 /* Inline number editor: click → input, Enter saves, Esc cancels */
@@ -163,7 +163,7 @@ export default function ProductsTable({ data, brands, counts, isAdmin, aiOn }) {
       <Tabs
         className="mb-3"
         value={status}
-        onChange={(v) => set({ status: v })}
+        onChange={(v) => set({ status: v }, { history: "push" })}
         tabs={[
           { value: "", label: "All", count: counts.ALL || 0 },
           { value: "ACTIVE", label: "Active", count: counts.ACTIVE || 0 },
@@ -278,7 +278,7 @@ export default function ProductsTable({ data, brands, counts, isAdmin, aiOn }) {
                       {p.soldCount}
                       <div className="text-[10.5px] text-mute">{p.viewCount} views</div>
                     </td>
-                    <td className="whitespace-nowrap text-[12px] text-mute">{timeAgo(p.updatedAt)}</td>
+                    <td className="whitespace-nowrap text-[12px] text-mute"><TimeAgo date={p.updatedAt} /></td>
                     <td>
                       <div className="flex items-center gap-1">
                         <Link href={`/admin/products/${p.id}`} className="a-btn a-btn-ghost a-btn-sm a-btn-icon" title="Edit" aria-label="Edit">

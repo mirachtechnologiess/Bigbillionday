@@ -264,6 +264,8 @@ model Coupon {
 model Order {
   id             String        @id @default(cuid())
   orderNumber    String        @unique
+  /// Running order number shown as S.No in admin (1 = first order ever; never reused)
+  serialNo       Int           @unique @default(autoincrement())
   userId         String?
   user           User?         @relation(fields: [userId], references: [id], onDelete: SetNull)
   email          String

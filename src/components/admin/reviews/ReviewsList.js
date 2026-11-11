@@ -7,7 +7,7 @@ import { BadgeCheck, Check, ExternalLink, MessageSquareText, Sparkles, Star, Tra
 import { toast } from "sonner";
 import { cn, storeUrl } from "@/lib/utils";
 import { api } from "../fetcher";
-import { ConfirmButton, Empty, PageHeader, Pagination, Pill, SearchInput, Spinner, Tabs, fmtDate, timeAgo, useQueryState } from "../ui";
+import { ConfirmButton, Empty, PageHeader, Pagination, Pill, SearchInput, Spinner, Tabs, fmtDate, TimeAgo, useQueryState } from "../ui";
 
 const STATUS_TONE = { PENDING: "gold", APPROVED: "lume", REJECTED: "danger" };
 const SENTIMENT_TONE = { positive: "lume", neutral: "mute", negative: "ember" };
@@ -117,7 +117,7 @@ export default function ReviewsList({ status, rows, counts, page, pages, total, 
       <Tabs
         className="mb-4"
         value={status}
-        onChange={(v) => set({ status: v === "PENDING" ? null : v })}
+        onChange={(v) => set({ status: v === "PENDING" ? null : v }, { history: "push" })}
         tabs={[
           { value: "PENDING", label: "Pending", count: counts.PENDING },
           { value: "APPROVED", label: "Approved", count: counts.APPROVED },
@@ -205,7 +205,7 @@ export default function ReviewsList({ status, rows, counts, page, pages, total, 
                     {s.sentiment && <Pill tone={SENTIMENT_TONE[s.sentiment] || "mute"} dot={false}><Sparkles className="h-3 w-3" /> {s.sentiment}</Pill>}
                     {s.spam && <Pill tone="danger">spam</Pill>}
                     {s.abusive && <Pill tone="danger">abusive</Pill>}
-                    <span className="text-[11.5px] text-mute" title={fmtDate(r.createdAt, true)}>{timeAgo(r.createdAt)}</span>
+                    <span className="text-[11.5px] text-mute" title={fmtDate(r.createdAt, true)}><TimeAgo date={r.createdAt} /></span>
                   </div>
 
                   {r.title && <div className="mt-2 text-[13.5px] font-semibold">{r.title}</div>}

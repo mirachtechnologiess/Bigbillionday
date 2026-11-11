@@ -10,7 +10,7 @@ import {
 import { toast } from "sonner";
 import { cn, formatINR, slugify, discountPct, WATCH_ATTRS, GENDER_LABEL, storeUrl } from "@/lib/utils";
 import { api } from "../fetcher";
-import { Card, ConfirmButton, Field, Pill, TagInput, Toggle, Spinner } from "../ui";
+import { BackLink, Card, ConfirmButton, Field, Pill, TagInput, Toggle, Spinner } from "../ui";
 import ImageUploader from "./ImageUploader";
 import { AiMark, ListEditor, ProductPreviewCard, SerpPreview, SpecsEditor } from "./EditorParts";
 
@@ -400,9 +400,9 @@ export default function ProductEditor({ product, meta, storeName, aiOn, isAdmin 
       {/* sticky top bar */}
       <div className="sticky top-14 z-30 -mx-3 mb-5 border-b border-line bg-ink/80 px-3 py-2.5 backdrop-blur-xl sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8">
         <div className="flex items-center gap-2">
-          <Link href="/admin/products" className="a-btn a-btn-ghost a-btn-sm a-btn-icon" aria-label="Back to products">
+          <BackLink href="/admin/products" className="a-btn a-btn-ghost a-btn-sm a-btn-icon" aria-label="Back to products">
             <ArrowLeft />
-          </Link>
+          </BackLink>
           <div className="min-w-0 flex-1">
             <div className="truncate font-display text-[22px] leading-none sm:text-[26px]">{form.name || (isNew ? "New product" : "Untitled")}</div>
             <div className="mt-1 flex items-center gap-2 text-[11px] text-mute">

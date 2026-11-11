@@ -10,7 +10,7 @@ import {
 import { toast } from "sonner";
 import { cn, formatINR, ORDER_FLOW, ORDER_STATUS_LABEL, storeUrl } from "@/lib/utils";
 import { api } from "../fetcher";
-import { Card, CopyButton, Field, Modal, OrderStatusPill, PageHeader, PAYMENT_TONE, Pill, RiskPill, Spinner, fmtDate, timeAgo } from "../ui";
+import { Card, CopyButton, Field, Modal, OrderStatusPill, PageHeader, PAYMENT_TONE, Pill, RiskPill, Spinner, fmtDate, TimeAgo } from "../ui";
 import ShipModal from "../shipping/ShipModal";
 import { ShipmentCard, TrackingTimeline, isActiveShipment } from "../shipping/ShipmentPanel";
 
@@ -141,7 +141,7 @@ export default function OrderDetail({ order: o, history, allowed, storeName }) {
     <div>
       <PageHeader
         back="/admin/orders"
-        eyebrow={`Order · ${fmtDate(o.createdAt, true)}`}
+        eyebrow={`Order S.No ${o.serialNo} · ${fmtDate(o.createdAt, true)}`}
         title={<span className="a-num">#{o.orderNumber}</span>}
         description={
           <span className="flex flex-wrap items-center gap-2">
@@ -308,7 +308,7 @@ export default function OrderDetail({ order: o, history, allowed, storeName }) {
                     <span className={cn("absolute -left-[5px] top-1.5 h-2.5 w-2.5 rounded-full border", i === 0 ? "border-gold bg-gold" : "border-line-2 bg-ink-4")} />
                     <div className="flex flex-wrap items-center gap-2">
                       <OrderStatusPill status={e.status} />
-                      <span className="text-[11.5px] text-mute" title={fmtDate(e.createdAt, true)}>{fmtDate(e.createdAt, true)} · {timeAgo(e.createdAt)}</span>
+                      <span className="text-[11.5px] text-mute" title={fmtDate(e.createdAt, true)}>{fmtDate(e.createdAt, true)} · <TimeAgo date={e.createdAt} /></span>
                     </div>
                     {e.note && <p className="mt-1 whitespace-pre-wrap text-[12.5px] text-bone-2">{e.note}</p>}
                   </li>
@@ -503,6 +503,7 @@ function CustomerHistory({ history }) {
             <table className="a-table w-full">
               <thead>
                 <tr>
+                  <th className="text-right">S.No</th>
                   <th>Order</th>
                   <th>Placed</th>
                   <th>Items</th>
@@ -517,12 +518,13 @@ function CustomerHistory({ history }) {
                   const qty = h.items.reduce((n, it) => n + it.quantity, 0);
                   return (
                     <tr key={h.id}>
+                      <td className="a-num whitespace-nowrap text-right text-[12.5px]">{h.serialNo}</td>
                       <td className="whitespace-nowrap">
                         <Link href={`/admin/orders/${h.id}`} className="a-num text-[12.5px] text-gold-2 hover:underline">#{h.orderNumber}</Link>
                       </td>
                       <td className="whitespace-nowrap text-[12px]">
                         <div>{fmtDate(h.createdAt, true)}</div>
-                        <div className="text-[11px] text-mute">{timeAgo(h.createdAt)}</div>
+                        <div className="text-[11px] text-mute"><TimeAgo date={h.createdAt} /></div>
                       </td>
                       <td>
                         <div className="flex min-w-[180px] items-center gap-2">

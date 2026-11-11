@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ExternalLink, ShieldCheck, Star } from "lucide-react";
 import { toast } from "sonner";
-import { Card, Empty, Pill, Spinner, Stat, timeAgo } from "../ui";
+import { Card, Empty, Pill, Spinner, Stat, TimeAgo } from "../ui";
 import { api } from "../fetcher";
 
 const SENT = { positive: "lume", neutral: "mute", negative: "ember" };
@@ -86,7 +86,7 @@ export default function ReviewModeration({ aiOn, autoModeration, reviews }) {
                   <p className="line-clamp-3 text-[12.5px] text-bone-2">{r.body}</p>
                   <div className="mt-1 text-[11px] text-mute">
                     {r.name}
-                    {r.verified && " · verified buyer"} · {timeAgo(r.createdAt)} ·{" "}
+                    {r.verified && " · verified buyer"} · <TimeAgo date={r.createdAt} /> ·{" "}
                     {r.product ? (
                       <Link href={`/admin/products/${r.product.id}`} className="hover:text-gold-2">
                         {r.product.name}

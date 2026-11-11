@@ -4,7 +4,7 @@ import Link from "next/link";
 import {
   AlertTriangle, ArrowUpRight, Banknote, CalendarDays, Crown, Gauge, IndianRupee, Mail, MessageSquareText, Package, Receipt, ShoppingBag, Wallet,
 } from "lucide-react";
-import { Card, Empty, OrderStatusPill, RiskPill, Stat, StockPill, ORDER_TONE, timeAgo } from "../ui";
+import { Card, Empty, OrderStatusPill, RiskPill, Stat, StockPill, ORDER_TONE, TimeAgo } from "../ui";
 import { cn, formatINR, ORDER_STATUS_LABEL } from "@/lib/utils";
 import LazyCharts from "./LazyCharts";
 import AiInsights from "./AiInsights";
@@ -223,7 +223,7 @@ export default function DashboardView({ stats: s, hello, date, aiOn }) {
                       <RiskPill score={o.riskScore} />
                     </td>
                     <td className="whitespace-nowrap text-[12px] text-mute" suppressHydrationWarning>
-                      {timeAgo(o.createdAt)}
+                      <TimeAgo date={o.createdAt} />
                     </td>
                   </tr>
                 ))}

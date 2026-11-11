@@ -6,7 +6,7 @@ import { Ban, Heart, Mail, MapPin, Phone, ShoppingBag, Star, Trash2, UserCheck, 
 import { toast } from "sonner";
 import { formatINR } from "@/lib/utils";
 import { api } from "../fetcher";
-import { Card, ConfirmButton, CopyButton, Empty, OrderStatusPill, PageHeader, PAYMENT_TONE, Pill, Stat, fmtDate, timeAgo } from "../ui";
+import { Card, ConfirmButton, CopyButton, Empty, OrderStatusPill, PageHeader, PAYMENT_TONE, Pill, Stat, fmtDate, TimeAgo } from "../ui";
 import { ROLE_TONE } from "./CustomersList";
 
 export default function CustomerDetail({ user: u, me }) {
@@ -74,7 +74,7 @@ export default function CustomerDetail({ user: u, me }) {
       />
 
       <div className="mb-4 grid grid-cols-2 gap-3 lg:grid-cols-4">
-        <Stat label="Orders" value={s.orders} sub={s.lastOrderAt ? `last ${timeAgo(s.lastOrderAt)}` : "none yet"} />
+        <Stat label="Orders" value={s.orders} sub={s.lastOrderAt ? `last $<TimeAgo date={s.lastOrderAt} />` : "none yet"} />
         <Stat label="Lifetime value" value={formatINR(s.spent)} sub="excl. cancelled/returned" tone="lume" />
         <Stat label="Avg order" value={formatINR(s.aov)} />
         <Stat label="Engagement" value={`${s.wishlist} · ${s.reviews}`} sub="wishlist · reviews" />

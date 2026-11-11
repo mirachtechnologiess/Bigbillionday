@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Lightbulb, RefreshCw, Sparkles } from "lucide-react";
 import { toast } from "sonner";
-import { Card, Pill, Spinner, timeAgo } from "../ui";
+import { Card, Pill, Spinner, TimeAgo } from "../ui";
 import { api } from "../fetcher";
 
 const KEY = "ps-admin-insights-v1";
@@ -44,7 +44,7 @@ export default function AiInsights({ aiOn }) {
       icon={Sparkles}
       actions={
         <>
-          {data?.at && <span className="hidden text-[11px] text-mute sm:inline">Generated {timeAgo(data.at)}</span>}
+          {data?.at && <span className="hidden text-[11px] text-mute sm:inline">Generated <TimeAgo date={data.at} /></span>}
           <button className="a-btn a-btn-ai a-btn-sm" onClick={run} disabled={busy || !aiOn} title={aiOn ? undefined : "AI is not configured"}>
             {busy ? <Spinner /> : data ? <RefreshCw /> : <Sparkles />}
             {busy ? "Analysing…" : data ? "Regenerate" : "Generate insights"}

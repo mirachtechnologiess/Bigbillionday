@@ -8,7 +8,7 @@ import { toast } from "sonner";
 import { cn, formatINR, ORDER_STATUS_LABEL } from "@/lib/utils";
 import { api } from "../fetcher";
 import {
-  Empty, OrderStatusPill, PageHeader, Pagination, PAYMENT_TONE, Pill, RiskPill, SearchInput, Spinner, Tabs, fmtDate, timeAgo, useQueryState,
+  Empty, OrderStatusPill, PageHeader, Pagination, PAYMENT_TONE, Pill, RiskPill, SearchInput, Spinner, Tabs, fmtDate, TimeAgo, useQueryState,
 } from "../ui";
 import ShipModal from "../shipping/ShipModal";
 import { shipTone } from "../shipping/ShipmentPanel";
@@ -120,12 +120,12 @@ export default function OrdersList({ rows, counts, page, pages, total }) {
       <Tabs
         className="mb-4"
         value={status}
-        onChange={(v) => set({ status: v === "ALL" ? null : v })}
+        onChange={(v) => set({ status: v === "ALL" ? null : v }, { history: "push" })}
         tabs={[{ value: "ALL", label: "All", count: counts.ALL }, ...STATUS_TABS.map((s) => ({ value: s, label: ORDER_STATUS_LABEL[s], count: counts[s] || 0 }))]}
       />
 
       <div className="mb-3 grid grid-cols-2 gap-2 sm:flex sm:flex-wrap sm:items-center">
-        <SearchInput className="col-span-2 sm:w-72" placeholder="Order #, phone, name or email" />
+        <SearchInput className="col-span-2 sm:w-72" placeholder="S.No, order #, phone, name or email" />
         <label className="relative">
           <span className="sr-only">From date</span>
           <input type="date" className="a-input sm:w-40" value={sp.get("from") || ""} onChange={(e) => set({ from: e.target.value })} aria-label="From date" />
@@ -178,13 +178,13 @@ export default function OrdersList({ rows, counts, page, pages, total }) {
                 <Link href={`/admin/orders/${o.id}`} className="min-w-0 flex-1">
                   <div className="flex items-start justify-between gap-2">
                     <div className="min-w-0">
-                      <div className="a-num text-[13px] text-gold-2">#{o.orderNumber}</div>
+                      <div className="a-num text-[13px] text-gold-2"><span className="text-bone">{o.serialNo}.</span> #{o.orderNumber}</div>
                       <div className="truncate text-[13.5px] font-medium">{o.shippingName}</div>
                       <div className="truncate text-[11.5px] text-mute">{o.phone} · {o.city}</div>
                     </div>
                     <div className="text-right">
                       <div className="a-num text-[14px]">{formatINR(o.total)}</div>
-                      <div className="text-[11px] text-mute">{fmtDate(o.createdAt, true)} · {timeAgo(o.createdAt)}</div>
+                      <div className="text-[11px] text-mute">{fmtDate(o.createdAt, true)} · <TimeAgo date={o.createdAt} /></div>
                     </div>
                   </div>
                   <div className="mt-2 flex flex-wrap items-center gap-1.5">
@@ -204,6 +204,7 @@ export default function OrdersList({ rows, counts, page, pages, total }) {
               <thead>
                 <tr>
                   <th className="w-8"><input type="checkbox" className="a-check" checked={allChecked} onChange={toggleAll} aria-label="Select all" /></th>
+                  <th className="text-right">S.No</th>
                   <th>Order</th>
                   <th>Customer</th>
                   <th>Items</th>
@@ -222,10 +223,11 @@ export default function OrdersList({ rows, counts, page, pages, total }) {
                     router.push(`/admin/orders/${o.id}`);
                   }}>
                     <td><input type="checkbox" className="a-check" checked={selected.has(o.id)} onChange={() => toggle(o.id)} aria-label={`Select ${o.orderNumber}`} /></td>
+                    <td className="a-num text-right font-semibold">{o.serialNo}</td>
                     <td>
                       <Link href={`/admin/orders/${o.id}`} className="a-num text-gold-2 hover:underline">#{o.orderNumber}</Link>
                     </td>
-                    <td className="max-w-[190px]">
+                    <td className="max-w-[165px]">
                       <div className="truncate font-medium">{o.shippingName}</div>
                       <div className="truncate text-[11.5px] text-mute">{o.phone} · {o.city}, {o.state}</div>
                     </td>
@@ -237,7 +239,7 @@ export default function OrdersList({ rows, counts, page, pages, total }) {
                             <img key={i} src={src} alt="" className="h-7 w-7 rounded-md border border-line-2 bg-ink-3 object-cover" />
                           ))}
                         </div>
-                        <span className="max-w-[120px] truncate text-[12px] text-bone-2" title={o.firstItem}>
+                        <span className="max-w-[105px] truncate text-[12px] text-bone-2" title={o.firstItem}>
                           {o.itemCount > 1 ? `${o.itemCount} items` : o.firstItem}
                         </span>
                       </div>
@@ -253,7 +255,7 @@ export default function OrdersList({ rows, counts, page, pages, total }) {
                         <CalendarRange className="mr-1 inline h-3 w-3 text-mute" />
                         {fmtDate(o.createdAt, true)}
                       </div>
-                      <div className="pl-4 text-[11px] text-mute">{timeAgo(o.createdAt)}</div>
+                      <div className="pl-4 text-[11px] text-mute"><TimeAgo date={o.createdAt} /></div>
                     </td>
                     <td className="a-sticky-end"><ShippingCell o={o} onShip={setShipFor} /></td>
                   </tr>
