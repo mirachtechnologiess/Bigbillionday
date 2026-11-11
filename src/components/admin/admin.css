@@ -130,3 +130,13 @@ select.a-input option { background: var(--color-ink); color: var(--color-bone); 
   .no-print { display: none !important; }
   .adm { background: #fff !important; color: #000 !important; }
 }
+
+/* Numbered pagination (« ‹ 1 … 4 5 [6] 7 8 … 31 › ») */
+.a-pages { display: inline-flex; align-items: stretch; border: 1px solid var(--color-line); border-radius: 10px; overflow: hidden; background: var(--color-ink); box-shadow: 0 1px 2px rgb(17 24 39 / .04); }
+.a-page { min-width: 32px; height: 32px; padding: 0 8px; display: inline-flex; align-items: center; justify-content: center; font-size: 12px; color: var(--color-bone-2); border-left: 1px solid var(--color-line); transition: background-color .15s, color .15s; }
+.a-page:first-child { border-left: 0; }
+.a-page svg { width: 14px; height: 14px; }
+.a-page:hover:not(:disabled):not([data-active="true"]):not(.a-page-gap) { background: var(--color-ink-2); color: var(--color-gold-2); }
+.a-page[data-active="true"] { background: var(--color-gold); color: #fff; font-weight: 600; }
+.a-page:disabled:not([data-active="true"]) { color: var(--color-mute); opacity: .45; cursor: not-allowed; }
+.a-page-gap { color: var(--color-mute); cursor: default; min-width: 28px; }

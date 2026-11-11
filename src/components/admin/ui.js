@@ -4,7 +4,7 @@ import { useEffect, useRef, useState, useTransition } from "react";
 import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
-import { Check, ChevronLeft, ChevronRight, Copy, ImagePlus, Loader2, Search, Sparkles, X } from "lucide-react";
+import { Check, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, Copy, ImagePlus, Loader2, Search, Sparkles, X } from "lucide-react";
 import { toast } from "sonner";
 import { cn, ORDER_STATUS_LABEL } from "@/lib/utils";
 import { uploadImage } from "./fetcher";
@@ -343,23 +343,82 @@ export function BackLink({ href, className, children, ...rest }) {
   );
 }
 
+/** Page numbers to show: always first/last, a window around the current page, "…" for gaps. */
+function pageWindow(page, pages) {
+  // ≤ 7 pages: show them all. Otherwise 7 slots: 1 2 3 4 5 … N  /  1 … p-1 p p+1 … N  /  1 … N-4 … N
+  if (pages <= 7) return Array.from({ length: pages }, (_, i) => i + 1);
+  if (page <= 4) return [1, 2, 3, 4, 5, "gap-r", pages];
+  if (page >= pages - 3) return [1, "gap-l", pages - 4, pages - 3, pages - 2, pages - 1, pages];
+  return [1, "gap-l", page - 1, page, page + 1, "gap-r", pages];
+}
+
 export function Pagination({ page, pages, total }) {
-  const { set } = useQueryState();
+  const { set, pending } = useQueryState();
+  const [jump, setJump] = useState("");
   useRememberListUrl();
   if (pages <= 1) return total !== undefined ? <div className="mt-3 text-xs text-mute">{total} result{total === 1 ? "" : "s"}</div> : null;
+  const go = (n) => {
+    const p = Math.min(pages, Math.max(1, Math.trunc(Number(n)) || 1));
+    if (p !== page) set({ page: p === 1 ? null : p }, { resetPage: false, history: "push" });
+  };
+  const nav = (label, target, disabled, children) => (
+    <button type="button" className="a-page" disabled={disabled || pending} onClick={() => go(target)} aria-label={label} title={label}>
+      {children}
+    </button>
+  );
   return (
-    <div className="mt-3 flex items-center justify-between gap-3 text-xs text-mute">
-      <span>
+    <div className="mt-3 flex flex-col gap-3 text-xs text-mute sm:flex-row sm:items-center sm:justify-between">
+      <span className="flex items-center gap-2">
         Page <span className="a-num text-bone">{page}</span> of <span className="a-num">{pages}</span>
         {total !== undefined && <> · {total} results</>}
+        {pending && <Spinner className="h-3.5 w-3.5" />}
       </span>
-      <div className="flex gap-1.5">
-        <button className="a-btn a-btn-sm a-btn-icon" disabled={page <= 1} onClick={() => set({ page: page - 1 }, { resetPage: false, history: "push" })} aria-label="Previous page">
-          <ChevronLeft />
-        </button>
-        <button className="a-btn a-btn-sm a-btn-icon" disabled={page >= pages} onClick={() => set({ page: page + 1 }, { resetPage: false, history: "push" })} aria-label="Next page">
-          <ChevronRight />
-        </button>
+      <div className="flex flex-wrap items-center gap-3">
+        <nav className="a-pages" aria-label="Pagination">
+          {nav("First page", 1, page <= 1, <ChevronsLeft />)}
+          {nav("Previous page", page - 1, page <= 1, <ChevronLeft />)}
+          {pageWindow(page, pages).map((n) =>
+            typeof n === "number" ? (
+              <button
+                key={n}
+                type="button"
+                className="a-page a-num"
+                data-active={n === page}
+                aria-current={n === page ? "page" : undefined}
+                disabled={pending}
+                onClick={() => go(n)}
+              >
+                {n}
+              </button>
+            ) : (
+              <span key={n} className="a-page a-page-gap" aria-hidden="true">…</span>
+            )
+          )}
+          {nav("Next page", page + 1, page >= pages, <ChevronRight />)}
+          {nav("Last page", pages, page >= pages, <ChevronsRight />)}
+        </nav>
+        {pages > 7 && (
+          <form
+            method="get"
+            className="flex items-center gap-1.5"
+            onSubmit={(e) => {
+              e.preventDefault();
+              if (jump) go(jump);
+              setJump("");
+            }}
+          >
+            <label htmlFor="page-jump" className="whitespace-nowrap">Go to</label>
+            <input
+              id="page-jump"
+              className="a-input a-num !h-8 !w-16 !px-2 text-center text-[12px]"
+              inputMode="numeric"
+              placeholder={String(page)}
+              value={jump}
+              onChange={(e) => setJump(e.target.value.replace(/D/g, "").slice(0, 5))}
+              aria-label={`Go to page (1–${pages})`}
+            />
+          </form>
+        )}
       </div>
     </div>
   );
